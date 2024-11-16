@@ -4,7 +4,6 @@ Gravity bounce with x motion
 If we add X velocity, from side to side, the player will bounce around the
 screen. We will need to add a check to see if the player hits the left or right
 side of the screen.
-
 """
 import pygame
 from dataclasses import dataclass
@@ -19,7 +18,7 @@ class Settings:
     red: tuple = (255, 0, 0)
     player_size: int = 20
     gravity: int = 1
-    jump_y_velocity: int = 30
+    jump_y_velocity: int = 50
     jump_x_velocity: int = 10
 
 # Initialize Pygame

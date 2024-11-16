@@ -5,8 +5,8 @@ pygame.init()
 
 # Constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 600, 600
-SQUARE_SIZE = 50
-SQUARE_COLOR = (255, 0, 0)  # Red
+SQUARE_SIZE = 30
+SQUARE_COLOR = (255, 0, 255)  # Red
 K = .0004
 
 # Set up the display
@@ -29,7 +29,8 @@ while running:
         if event.type == pygame.QUIT:
             
             running = False
-         
+    if keys[pygame.K_SPACE]:
+        print("you pressed space")
     # Calculate the spring force, which is the force that pulls the square back
     # to the center, as if it was attached to a spring
     a = -K * (x_pos - (SCREEN_WIDTH-SQUARE_SIZE) // 2)
