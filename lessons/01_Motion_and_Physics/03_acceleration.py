@@ -29,8 +29,6 @@ while running:
         if event.type == pygame.QUIT:
             
             running = False
-    if keys[pygame.K_SPACE]:
-        print("you pressed space")
     # Calculate the spring force, which is the force that pulls the square back
     # to the center, as if it was attached to a spring
     a = -K * (x_pos - (SCREEN_WIDTH-SQUARE_SIZE) // 2)

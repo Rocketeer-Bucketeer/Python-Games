@@ -5,7 +5,7 @@ If we add X velocity, from side to side, the player will bounce around the
 screen. We will need to add a check to see if the player hits the left or right
 side of the screen.
 """
-import pygame
+import pygame 
 from dataclasses import dataclass
 
 @dataclass
@@ -34,8 +34,8 @@ screen = pygame.display.set_mode((settings.screen_width, settings.screen_height)
 player = pygame.Rect(100, settings.screen_height - settings.player_size, settings.player_size, settings.player_size)
 
 player_y_velocity = 0
-player_x_velocity = 0
-x_direction = 1 # Elther 1 or negative 1, so we can keep track for direction after hitting the ground
+player_x_velocity = 120
+x_direction = 0 # Elther 1 or negative 1, so we can keep track for direction after hitting the ground
 
 is_jumping = False
 
@@ -44,19 +44,32 @@ running = True
 clock = pygame.time.Clock()
 
 while running:
-
+    keys = pygame.key.get_pressed()
+    if is_jumping is False and keys[pygame.K_w] and keys[pygame.K_a]:
+        player_y_velocity = -settings.jump_y_velocity
+        x_direction = -1 
+        player_x_velocity = settings.jump_x_velocity * x_direction
+        print("left")
+        is_jumping = True
+    if is_jumping is False and keys[pygame.K_w] and keys[pygame.K_d]:
+        player_y_velocity = -settings.jump_y_velocity
+        x_direction = 1
+        player_x_velocity = settings.jump_x_velocity * x_direction
+        print("left")
+        is_jumping = True
     # Handle events, such as quitting the game
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+    
     # Continuously jump. If the player is not jumping, make it jump
-    if is_jumping is False:
+    if is_jumping is False and keys[pygame.K_w]:
         # Jumping means that the player is going up. The top of the 
         # screen is y=0, and the bottom is y=settings.screen_height. So, to go up,
         # we need to have a negative y velocity
         
         player_y_velocity = -settings.jump_y_velocity
+        x_direction = 0.00001
         player_x_velocity = settings.jump_x_velocity * x_direction
         
         is_jumping = True
@@ -70,6 +83,7 @@ while running:
         player_y_velocity += settings.gravity
         player.y += player_y_velocity
         player.x += player_x_velocity
+
         
     # If the player hits one side of the screen or the other, bounce the player
     if player.left <= 0 or player.right >= settings.screen_width:
@@ -79,7 +93,7 @@ while running:
         x_direction = -x_direction 
         # But this way is more reliable, since it will always be 1 or -1 and dir is tied to velocity
         x_direction = player_x_velocity // abs(player_x_velocity)
-
+                   
     # If the player hits the top of the screen, bounce the player
     if player.top <= 0:
         player_y_velocity = -player_y_velocity
@@ -89,7 +103,7 @@ while running:
         player.bottom = settings.screen_height
         player_y_velocity = 0
         
-        player_x_velocity = 0
+        player_x_velocity = 0.0001
         
         is_jumping = False
 
@@ -102,4 +116,4 @@ while running:
     pygame.display.flip()
     clock.tick(30)
 
-pygame.quit()
+
