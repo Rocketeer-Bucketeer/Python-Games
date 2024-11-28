@@ -18,7 +18,7 @@ class Settings:
     red: tuple = (255, 0, 0)
     player_size: int = 20
     gravity: int = 1
-    jump_y_velocity: int = 50
+    jump_y_velocity: int = 15
     jump_x_velocity: int = 10
 
 # Initialize Pygame
