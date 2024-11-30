@@ -19,7 +19,7 @@ class Settings:
     player_size: int = 20
     gravity: int = 1
     jump_y_velocity: int = 15
-    jump_x_velocity: int = 10
+    jump_x_velocity: int = 8
 
 # Initialize Pygame
 pygame.init()
@@ -93,6 +93,8 @@ while running:
         x_direction = -x_direction 
         # But this way is more reliable, since it will always be 1 or -1 and dir is tied to velocity
         x_direction = player_x_velocity // abs(player_x_velocity)
+
+    
                    
     # If the player hits the top of the screen, bounce the player
     if player.top <= 0:
@@ -106,6 +108,8 @@ while running:
         player_x_velocity = 0.0001
         
         is_jumping = False
+    
+    
 
 
 

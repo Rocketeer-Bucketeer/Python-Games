@@ -46,6 +46,10 @@ class Turtle:
         # Turn left by adjusting the angle counterclockwise
         self.angle = (self.angle + angle) % 360
 
+    def right(self, angle):
+        # Turn right by adjusting the angle counterclockwise
+        self.angle= (self.angle + angle) % 360
+
 
 # Main loop
 
@@ -67,8 +71,21 @@ turtle = Turtle(screen, screen.get_width() // 2, screen.get_height() // 2)  # St
 # Draw a square using turtle-style commands
 for _ in range(4):
     turtle.forward(100)  # Move forward by 100 pixels
-    turtle.left(90)  # Turn left by 90 degrees
+    turtle.right(90)  # Turn left by 90 degrees
 
+
+
+def pos():
+    print(turtle.x)
+    print(turtle.y)
+    
+
+
+
+
+turtle.forward(100)
+
+pos()
 # Display the drawing
 pygame.display.flip()
 

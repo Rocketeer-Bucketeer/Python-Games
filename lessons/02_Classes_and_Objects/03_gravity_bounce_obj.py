@@ -8,12 +8,14 @@ allows for more complex games with multiple objects.
 
 """
 import pygame
-
+import time
+import math
+import random
 
 class Colors:
     """Constants for Colors"""
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
+    WHITE = (0, 0, 0)
+    BLACK = (255, 2, 2)
     RED = (255, 0, 0)
 
 
@@ -64,7 +66,7 @@ class Game:
             for player in self.players:
                 player.update()
                 player.draw(self.screen)
-                
+
             pygame.display.flip()
             self.clock.tick(60)
 
@@ -95,6 +97,7 @@ class Player:
         self.update_jump()
         self.update_y()
         self.update_x()
+    
 
     def update_y(self):
         """Update the player's y position based on gravity and velocity"""
@@ -113,26 +116,66 @@ class Player:
         if self.x <= 0:
             self.x = 0
             self.v_x = -self.v_x
+            self.create_new_player()  # Create a new player on the left wall collision
+
         elif self.x >= self.game.settings.width - self.width:
             self.x = self.game.settings.width - self.width
             self.v_x = -self.v_x
+            self.create_new_player()  # Create a new player on the right wall collision
 
+    def create_new_player(self):
+        """Create a new player when the current one hits the wall"""
+        hi = random.randint(0,15)
+        if hi == 0:
+            pass
+        if hi == 1:
+            new_player = Player(self.game)
+            self.game.add_player(new_player)
+        if hi > 1:
+            pass
+
+
+        
     def update_jump(self):
         """Handle the player's jumping logic"""
         
         if not self.is_jumping:
             self.v_y = -self.v_jump
             self.is_jumping = True
+    
+        
+
 
     def draw(self, screen):
-        pygame.draw.rect(screen, Colors.BLACK, (self.x, self.y, self.width, self.height))
+        random_number = random.randint(1,3)
+        
+        if random_number == 1:
+            pygame.draw.ellipse(screen, (255,2,2), (self.x, self.y, self.width, self.height))
+        if random_number == 2:
+            pygame.draw.ellipse(screen, (252, 2, 2), (self.x, self.y, self.width, self.height))
+        if random_number == 3:
+            pygame.draw.ellipse(screen, (255,2,2), (self.x, self.y, self.width, self.height))
+
+
+
+
+
 
 
 settings = GameSettings()
 game = Game(settings)
 
 p1 = Player(game)
+
 game.add_player(p1)
+
+game.run()
+
+
+
+    
+
+
 
 
 game.run()
