@@ -18,7 +18,7 @@ class Settings:
     """A class to store all settings for the game."""
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 600
-    BACKGROUND_SCROLL_SPEED = 2
+    BACKGROUND_SCROLL_SPEED = 10
     FPS = 30
 
 # Initialize screen
