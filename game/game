@@ -1,0 +1,101 @@
+import pygame
+import math
+
+# Initialize Pygame
+pygame.init()
+
+# Set up the screen
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Red Ball Launch!")
+
+# Colors
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
+
+# Player settings (Red ball)
+player_radius = 10
+player_x = SCREEN_WIDTH // 2
+player_y = SCREEN_HEIGHT // 2
+ball_velocity = [0, 0]
+
+# Physics settings
+gravity = 1
+friction = 1 # Air resistance to slow down the ball
+
+# Game variables
+dragging = False
+drag_start_x = 0
+drag_start_y = 0
+score = 0
+
+# Game clock
+clock = pygame.time.Clock()
+
+# Font for the score
+font = pygame.font.SysFont("Arial", 30)
+
+# Game loop
+running = True
+while running:
+    # Fill the screen with white
+    screen.fill(WHITE)
+
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Start dragging when mouse is clicked on the ball
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            dragging = True
+            drag_start_x, drag_start_y = mouse_x, mouse_y
+        if event.type == pygame.MOUSEBUTTONUP:
+            # Release the ball when mouse is released
+            if dragging:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                # Calculate velocity based on drag distance
+                delta_x = mouse_x - drag_start_x
+                delta_y = mouse_y - drag_start_y
+                ball_velocity = [delta_x * 0.3, delta_y * 0.3]  # Scale down to control speed
+                dragging = False
+
+    # Update ball physics if not dragging
+    if not dragging:
+        # Apply gravity to velocity
+        ball_velocity[1] += gravity
+        
+        # Update position based on velocity
+        player_x += ball_velocity[0]
+        player_y += ball_velocity[1]
+        
+        # Apply friction to slow down the ball
+        ball_velocity[0] *= friction
+        ball_velocity[1] *= friction
+        
+        # Boundary collisions: bounce the ball off the edges
+        if player_x - player_radius < 0 or player_x + player_radius > SCREEN_WIDTH:
+            ball_velocity[0] *= -1  # Invert horizontal velocity
+            player_x = max(player_radius, min(player_x, SCREEN_WIDTH - player_radius))  # Keep ball within bounds
+        
+        if player_y - player_radius < 0 or player_y + player_radius > SCREEN_HEIGHT:
+            ball_velocity[1] *= -1  # Invert vertical velocity
+            player_y = max(player_radius, min(player_y, SCREEN_HEIGHT - player_radius))  # Keep ball within bounds
+    
+    # Draw the red ball
+    pygame.draw.circle(screen, RED, (int(player_x), int(player_y)), player_radius)
+
+    # Show the score (could be related to time survived or targets hit)
+    score_text = font.render(f"Score: {score}", True, BLACK)
+    screen.blit(score_text, (10, 10))
+
+    # Update the display
+    pygame.display.flip()
+
+    # Control the frame rate
+    clock.tick(60)
+
+# Quit Pygame
+pygame.quit()

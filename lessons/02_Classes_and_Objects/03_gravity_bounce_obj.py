@@ -8,14 +8,12 @@ allows for more complex games with multiple objects.
 
 """
 import pygame
-import time
-import math
 import random
 
 class Colors:
     """Constants for Colors"""
-    WHITE = (0, 0, 0)
-    BLACK = (255, 2, 2)
+    WHITE = (0, 0, 0)  # Fixed white color
+    BLACK = (255, 0, 0)
     RED = (255, 0, 0)
 
 
@@ -25,12 +23,13 @@ class GameSettings:
     height: int = 500
     gravity: float = 0.3
     player_start_x: int = 100
-    player_start_y: int = None
+    player_start_y: int = None  # Can be None, but handled in Player class
     player_v_y: float = 0  # Initial y velocity
     player_v_x: float = 7  # Initial x velocity
     player_width: int = 20
     player_height: int = 20
     player_jump_velocity: float = 15
+    max_players: int = 10  # Maximum number of players
 
 
 class Game:
@@ -50,8 +49,8 @@ class Game:
         self.players = []
 
     def add_player(self, player):
-        self.players.append(player)
-
+        if len(self.players) < self.settings.max_players:  # Only add player if under the max limit
+            self.players.append(player)
 
     def run(self):
         """Main game loop"""
@@ -82,7 +81,7 @@ class Player:
 
         self.width = settings.player_width
         self.height = settings.player_height
-      
+
         self.is_jumping = False
         self.v_jump = settings.player_jump_velocity
 
@@ -124,58 +123,38 @@ class Player:
             self.create_new_player()  # Create a new player on the right wall collision
 
     def create_new_player(self):
-        """Create a new player when the current one hits the wall"""
-        hi = random.randint(0,15)
-        if hi == 0:
-            pass
-        if hi == 1:
-            new_player = Player(self.game)
-            self.game.add_player(new_player)
-        if hi > 1:
-            pass
+        """Create a new player when the current one hits the wall, only if under the limit"""
+        if len(self.game.players) < self.game.settings.max_players:
+            hi = random.randint(0, 15)
+            if hi == 1:
+                new_player = Player(self.game)
+                self.game.add_player(new_player)  # Add new player if under max limit
+        # No need to pass if hi > 1 as the default behavior is to not create a new player
 
-
-        
     def update_jump(self):
         """Handle the player's jumping logic"""
-        
         if not self.is_jumping:
             self.v_y = -self.v_jump
             self.is_jumping = True
-    
-        
-
 
     def draw(self, screen):
-        random_number = random.randint(1,3)
+        random_number = random.randint(1, 3)
         
         if random_number == 1:
-            pygame.draw.ellipse(screen, (255,2,2), (self.x, self.y, self.width, self.height))
-        if random_number == 2:
+            pygame.draw.ellipse(screen, (255, 2, 2), (self.x, self.y, self.width, self.height))
+        elif random_number == 2:
             pygame.draw.ellipse(screen, (252, 2, 2), (self.x, self.y, self.width, self.height))
-        if random_number == 3:
-            pygame.draw.ellipse(screen, (255,2,2), (self.x, self.y, self.width, self.height))
+        else:
+            pygame.draw.ellipse(screen, (255, 2, 2), (self.x, self.y, self.width, self.height))
 
 
-
-
-
-
-
+# Game setup
 settings = GameSettings()
 game = Game(settings)
 
 p1 = Player(game)
 
-game.add_player(p1)
+game.add_player(p1)  # Add the first player
 
 game.run()
 
-
-
-    
-
-
-
-
-game.run()
