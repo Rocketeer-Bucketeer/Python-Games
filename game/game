@@ -1,35 +1,47 @@
 import pygame
 import math
+import time  # To use time tracking for the combo reset
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the screen
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 650
+SCREEN_HEIGHT = 650
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Red Ball Launch!")
 
 # Colors
 WHITE = (255, 255, 255)
+BLUE = (132, 175, 245)
+BLACK = (88, 93, 102)
 RED = (255, 0, 0)
-BLACK = (0, 0, 0)
+YELLOW = (235, 174, 52)
+GREEN = (17, 107, 14)
+BLUE = (59, 73, 196)
 
 # Player settings (Red ball)
-player_radius = 10
+player_radius = 15
 player_x = SCREEN_WIDTH // 2
 player_y = SCREEN_HEIGHT // 2
 ball_velocity = [0, 0]
 
+# Stationary ball settings
+stationary_radius = 50
+stationary_x = SCREEN_WIDTH // 3
+stationary_y = SCREEN_HEIGHT // 3
+
 # Physics settings
-gravity = 1
-friction = 1 # Air resistance to slow down the ball
+gravity = 0.2
+friction = 0.9  # Air resistance to slow down the ball
 
 # Game variables
 dragging = False
 drag_start_x = 0
 drag_start_y = 0
 score = 0
+last_hit_time = time.time()  # Start the timer when the game begins
+combo_timeout = 2  # Seconds before combo resets
 
 # Game clock
 clock = pygame.time.Clock()
@@ -37,26 +49,78 @@ clock = pygame.time.Clock()
 # Font for the score
 font = pygame.font.SysFont("Arial", 30)
 
+# Function to handle collision with the stationary ball
+def handle_collision():
+    global ball_velocity, player_x, player_y, score, last_hit_time  # Include score and last_hit_time in global variables
+    # Calculate the vector from the stationary ball to the player
+    dx = player_x - stationary_x
+    dy = player_y - stationary_y
+    distance = math.sqrt(dx**2 + dy**2)
+    
+    # Check for collision
+    if distance < player_radius + stationary_radius:
+        # Normalize the collision vector
+        normal_x = dx / distance
+        normal_y = dy / distance
+        
+        # Increment score and reset the timer every time a collision occurs
+        score += 1
+        last_hit_time = time.time()  # Reset the combo timer
+
+        # Dot product of the velocity and the normal vector (to calculate the reflection)
+        velocity_dot_normal = ball_velocity[0] * normal_x + ball_velocity[1] * normal_y
+        
+        # Reflect the velocity
+        ball_velocity[0] -= 2 * velocity_dot_normal * normal_x
+        ball_velocity[1] -= 2 * velocity_dot_normal * normal_y
+        
+        # Position the player ball outside the stationary ball to avoid sticking
+        overlap = player_radius + stationary_radius - distance
+        player_x += normal_x * overlap
+        player_y += normal_y * overlap
+
+# Function to get the grade based on the combo score
+def get_grade(combo_score):
+    if combo_score >= 500:
+        return "SSS", (255, 215, 0)  # Gold for SSS
+    elif combo_score >= 250:
+        return "SS", (255, 0, 0)  # Red for SS
+    elif combo_score >= 100:
+        return "S", (0, 255, 0)  # Green for S
+    elif combo_score >= 10:
+        return "A", (0, 0, 255)  # Blue for A
+    elif combo_score >= 5:
+        return "B", (255, 165, 0)  # Orange for B
+    elif combo_score >= 2:
+        return "C", (255, 255, 0)  # Yellow for C
+    elif combo_score >= 1:
+        return "D", (128, 128, 128)  # Gray for D
+    else:
+        return "F", (128, 0, 0)  # Dark Red for F
+    
 # Game loop
 running = True
 while running:
-    # Fill the screen with white
-    screen.fill(WHITE)
+    # Fill the screen with black
+    screen.fill(BLACK)
 
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # Start dragging when mouse is clicked on the ball
+            # drag when clicked on ball
             mouse_x, mouse_y = pygame.mouse.get_pos()
             dragging = True
             drag_start_x, drag_start_y = mouse_x, mouse_y
+        if dragging == True:
+            pygame.draw.line(screen, (50, 168, 52), (player_x, player_y), pygame.mouse.get_pos(), 5)
         if event.type == pygame.MOUSEBUTTONUP:
-            # Release the ball when mouse is released
+            # Release the ball 
             if dragging:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                # Calculate velocity based on drag distance
+                
+                # Calculate velocity 
                 delta_x = mouse_x - drag_start_x
                 delta_y = mouse_y - drag_start_y
                 ball_velocity = [delta_x * 0.3, delta_y * 0.3]  # Scale down to control speed
@@ -83,18 +147,35 @@ while running:
         if player_y - player_radius < 0 or player_y + player_radius > SCREEN_HEIGHT:
             ball_velocity[1] *= -1  # Invert vertical velocity
             player_y = max(player_radius, min(player_y, SCREEN_HEIGHT - player_radius))  # Keep ball within bounds
-    
-    # Draw the red ball
-    pygame.draw.circle(screen, RED, (int(player_x), int(player_y)), player_radius)
+        
+        # Handle collision with the stationary ball
+        handle_collision()
 
-    # Show the score (could be related to time survived or targets hit)
-    score_text = font.render(f"Score: {score}", True, BLACK)
+    # Reset combo if time since last hit exceeds the timeout threshold
+    if time.time() - last_hit_time > combo_timeout:
+        score = 0  # Reset score if timeout exceeded
+
+    # Get the letter grade and color based on the score
+    grade, grade_color = get_grade(score)
+
+    # Draw the stationary ball (large ball)
+    pygame.draw.circle(screen, RED, (stationary_x, stationary_y), stationary_radius)
+
+    # Draw the red ball (player ball)
+    pygame.draw.circle(screen, BLUE, (int(player_x), int(player_y)), player_radius)
+
+    # Show score and grade
+    score_text = font.render(f"Combo: {score}", True, WHITE)
+    grade_text = font.render(f"Grade: {grade}", True, grade_color)  # Use dynamic color
+
+    # Display the score and grade on the screen
     screen.blit(score_text, (10, 10))
+    screen.blit(grade_text, (10, 40))
 
     # Update the display
     pygame.display.flip()
 
-    # Control the frame rate
+    # Frame rate
     clock.tick(60)
 
 # Quit Pygame
