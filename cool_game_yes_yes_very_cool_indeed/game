@@ -14,7 +14,7 @@ pygame.display.set_caption("Red Ball Launch!")
 # Colors
 WHITE = (255, 255, 255)
 BLUE = (132, 175, 245)
-BLACK = (88, 93, 102)
+BLACK = (48,48,48)
 RED = (255, 0, 0)
 YELLOW = (235, 174, 52)
 GREEN = (17, 107, 14)
@@ -25,6 +25,7 @@ player_radius = 15
 player_x = SCREEN_WIDTH // 2
 player_y = SCREEN_HEIGHT // 2
 ball_velocity = [0, 0]
+
 
 # Stationary ball settings
 stationary_radius = 50
@@ -66,6 +67,7 @@ def handle_collision():
         # Increment score and reset the timer every time a collision occurs
         score += 1
         last_hit_time = time.time()  # Reset the combo timer
+        
 
         # Dot product of the velocity and the normal vector (to calculate the reflection)
         velocity_dot_normal = ball_velocity[0] * normal_x + ball_velocity[1] * normal_y
@@ -97,7 +99,23 @@ def get_grade(combo_score):
         return "D", (128, 128, 128)  # Gray for D
     else:
         return "F", (128, 0, 0)  # Dark Red for F
+
+# Function to calculate the trajectory of the ball (parabola)
+def draw_trajectory(start_x, start_y, velocity_x, velocity_y, screen):
+    steps = 30  # Increased the number of points to extend the trajectory
+    time_step = 0.1  # Increased the time step to make the trajectory longer
+    trajectory_points = []
     
+    for i in range(steps):
+        time_passed = i * time_step
+        x = start_x + velocity_x * time_passed
+        y = start_y + velocity_y * time_passed + 0.5 * gravity * time_passed**2
+        if x > 0 and x < SCREEN_WIDTH and y > 0 and y < SCREEN_HEIGHT:
+            trajectory_points.append((x, y))
+    
+    for point in trajectory_points:
+        pygame.draw.circle(screen, YELLOW, (int(point[0]), int(point[1])), 3)  # Draw each point of the trajectory
+
 # Game loop
 running = True
 while running:
@@ -113,8 +131,6 @@ while running:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             dragging = True
             drag_start_x, drag_start_y = mouse_x, mouse_y
-        if dragging == True:
-            pygame.draw.line(screen, (50, 168, 52), (player_x, player_y), pygame.mouse.get_pos(), 5)
         if event.type == pygame.MOUSEBUTTONUP:
             # Release the ball 
             if dragging:
@@ -165,12 +181,19 @@ while running:
     pygame.draw.circle(screen, BLUE, (int(player_x), int(player_y)), player_radius)
 
     # Show score and grade
-    score_text = font.render(f"Combo: {score}", True, WHITE)
+    score_text = font.render(f"Combo: {score}X", True, WHITE)
     grade_text = font.render(f"Grade: {grade}", True, grade_color)  # Use dynamic color
 
     # Display the score and grade on the screen
     screen.blit(score_text, (10, 10))
     screen.blit(grade_text, (10, 40))
+
+    # Draw the drag trajectory
+    if dragging:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        delta_x = mouse_x - drag_start_x
+        delta_y = mouse_y - drag_start_y
+        draw_trajectory(player_x, player_y, delta_x * 0.3, delta_y * 0.3, screen)
 
     # Update the display
     pygame.display.flip()
