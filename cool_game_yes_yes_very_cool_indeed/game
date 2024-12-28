@@ -14,11 +14,13 @@ pygame.display.set_caption("Red Ball Launch!")
 # Colors
 WHITE = (255, 255, 255)
 BLUE = (132, 175, 245)
-BLACK = (48,48,48)
+BLACK = (48, 48, 48)
 RED = (255, 0, 0)
 YELLOW = (235, 174, 52)
 GREEN = (17, 107, 14)
 BLUE = (59, 73, 196)
+
+bg_color = BLACK
 
 # Player settings (Red ball)
 player_radius = 15
@@ -26,10 +28,9 @@ player_x = SCREEN_WIDTH // 2
 player_y = SCREEN_HEIGHT // 2
 ball_velocity = [0, 0]
 
-
 # Stationary ball settings
 stationary_radius = 200
-stationary_x = 0    
+stationary_x = 0
 stationary_y = 0
 
 # Physics settings
@@ -52,7 +53,7 @@ font = pygame.font.SysFont("Arial", 30)
 
 # Function to handle collision with the stationary ball
 def handle_collision():
-    global ball_velocity, player_x, player_y, score, last_hit_time  # Include score and last_hit_time in global variables
+    global ball_velocity, player_x, player_y, score, last_hit_time, bg_color  # Include score and last_hit_time in global variables
     # Calculate the vector from the stationary ball to the player
     dx = player_x - stationary_x
     dy = player_y - stationary_y
@@ -68,7 +69,6 @@ def handle_collision():
         score += 1
         last_hit_time = time.time()  # Reset the combo timer
         
-
         # Dot product of the velocity and the normal vector (to calculate the reflection)
         velocity_dot_normal = ball_velocity[0] * normal_x + ball_velocity[1] * normal_y
         
@@ -80,6 +80,8 @@ def handle_collision():
         overlap = player_radius + stationary_radius - distance
         player_x += normal_x * overlap
         player_y += normal_y * overlap
+
+        bg_color = WHITE
 
 # Function to get the grade based on the combo score
 def get_grade(combo_score):
@@ -100,7 +102,7 @@ def get_grade(combo_score):
     else:
         return "F", (128, 0, 0)  # Dark Red for F
 
-# trajectory of ball -- very cool --- the line yes yes
+# Trajectory of the ball
 def draw_trajectory(start_x, start_y, velocity_x, velocity_y, screen):
     steps = 30  # Increased the number of points to extend the trajectory
     time_step = 0.1  # Increased the time step to make the trajectory longer
@@ -118,9 +120,14 @@ def draw_trajectory(start_x, start_y, velocity_x, velocity_y, screen):
 
 # Game loop
 running = True
+pause = False
 while running:
     # Fill the screen with black
-    screen.fill(BLACK)
+    screen.fill(bg_color)
+
+    if bg_color != BLACK:
+        pause = True
+        bg_color = BLACK
 
     # Event handling
     for event in pygame.event.get():
@@ -139,7 +146,7 @@ while running:
                 # Calculate velocity 
                 delta_x = mouse_x - drag_start_x
                 delta_y = mouse_y - drag_start_y
-                ball_velocity = [delta_x * 0.3, delta_y * 0.3]  # Scale down to control speed
+                ball_velocity = [delta_x * 0.25, delta_y * 0.25]  # Adjust sensitivity to improve accuracy
                 dragging = False
 
     # Update ball physics if not dragging
@@ -193,12 +200,15 @@ while running:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         delta_x = mouse_x - drag_start_x
         delta_y = mouse_y - drag_start_y
-        draw_trajectory(player_x, player_y, delta_x * 0.3, delta_y * 0.3, screen)
+        draw_trajectory(player_x, player_y, delta_x * 0.25, delta_y * 0.25, screen)
 
     # Update the display
     pygame.display.flip()
 
     # Frame rate
+    if pause:
+        pygame.time.delay(100)
+        pause = False
     clock.tick(60)
 
 # Quit Pygame
