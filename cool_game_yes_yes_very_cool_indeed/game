@@ -189,9 +189,9 @@ while running:
 
     # Show score and grade
     score_text = font.render(f"Combo: {score}X", True, WHITE)
-    grade_text = font.render(f"Grade: {grade}", True, grade_color)  # Use dynamic color
+    grade_text = font.render(f"Grade: {grade}", True, grade_color)  
 
-    # Display the score and grade on the screen
+    
     screen.blit(score_text, (10, 10))
     screen.blit(grade_text, (10, 40))
 

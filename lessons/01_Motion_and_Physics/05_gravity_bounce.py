@@ -45,13 +45,13 @@ clock = pygame.time.Clock()
 
 while running:
     keys = pygame.key.get_pressed()
-    if is_jumping is False and keys[pygame.K_w] and keys[pygame.K_a]:
+    if is_jumping is False and keys[pygame.K_a]:
         player_y_velocity = -settings.jump_y_velocity
         x_direction = -1 
         player_x_velocity = settings.jump_x_velocity * x_direction
         print("left")
         is_jumping = True
-    if is_jumping is False and keys[pygame.K_w] and keys[pygame.K_d]:
+    if is_jumping is False and keys[pygame.K_d]:
         player_y_velocity = -settings.jump_y_velocity
         x_direction = 1
         player_x_velocity = settings.jump_x_velocity * x_direction

@@ -90,7 +90,8 @@ class Player:
                                   settings.player_start_y if settings.player_start_y is not None else settings.height - self.height)
         
         # Player's velocity
-        self.vel = pygame.Vector2(settings.player_v_x, settings.player_v_y)  # Velocity vector
+        self.vel = pygame.Vector2(settings.player_v_x, settings.player_v_y)
+        self.drag = pygame.Vector2(0, -0.1)  # Drag
 
 
 
@@ -146,6 +147,7 @@ class Player:
         """Update the player's velocity based on gravity and bounce on edges"""
          
         self.vel += self.game.gravity  # Add gravity to the velocity
+        self.vel -= self.drag
 
         if self.at_bottom() and self.going_down():
             self.vel.y = 0

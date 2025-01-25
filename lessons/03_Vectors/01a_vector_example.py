@@ -18,22 +18,16 @@ Vector20, draw_v20, draw_grid = Vector20Factory(screen_width, screen_height, 20)
 draw_grid(screen)
 
 # Create some vectors
-v0 = Vector20(0,0)
-v1 = Vector20(0, 1)  
-v2 = Vector20(3, -12)  
-v3 = Vector20(-4, -2)  
-v4 = Vector20(-12, 0) 
-v5 = Vector20(0, 12)
+vectors = [Vector20(0, 5), Vector20(5, 0), Vector20(0, -5), Vector20(-5, 0)]
+start = Vector20(0,0)
 
-start = draw_v20(screen, v0, v1)
-start = draw_v20(screen, start, v2)
-start = draw_v20(screen, start, v3)
-start = draw_v20(screen, start, v4)
-start = draw_v20(screen, start, v5)
+for i in vectors:
+    pre = draw_v20(screen, start, i)
+    start = pre
 
 # Update display
 pygame.display.flip()
-
+ 
 # Game loop, just pausing so you can see the screen. 
 running = True
 while running:

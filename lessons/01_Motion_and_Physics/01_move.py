@@ -11,7 +11,7 @@ import pygame
 # Initialize Pygame
 pygame.init()
 
-# Constants
+# Constantsz
 SCREEN_WIDTH, SCREEN_HEIGHT = 600, 600
 SQUARE_SIZE = 50
 SQUARE_COLOR = (0, 128, 255) # Red-Green-Blue color in the range 0-255
