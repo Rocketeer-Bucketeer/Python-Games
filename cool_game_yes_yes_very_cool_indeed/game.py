@@ -1,7 +1,7 @@
 import pygame
 import math
 import time  # To use time tracking for the combo reset
-
+import random
 # Initialize Pygame
 pygame.init()
 
@@ -12,6 +12,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Red Ball Launch!")
 
 # Colors
+FLASH = (150,150,150)
 WHITE = (255, 255, 255)
 BLUE = (132, 175, 245)
 BLACK = (48, 48, 48)
@@ -29,13 +30,13 @@ player_y = SCREEN_HEIGHT // 2
 ball_velocity = [0, 0]
 
 # Stationary ball settings
-stationary_radius = 200
-stationary_x = 0
+stationary_radius = 50
+stationary_x = 500
 stationary_y = 0
 
 # Physics settings
-gravity = 0.2
-friction = 0.9  # Air resistance to slow down the ball
+gravity = 1
+friction = 0.9 # Air resistance to slow down the ball
 
 # Game variables
 dragging = False
@@ -51,14 +52,16 @@ clock = pygame.time.Clock()
 # Font for the score
 font = pygame.font.SysFont("Arial", 30)
 
+
+
 # Function to handle collision with the stationary ball
 def handle_collision():
-    global ball_velocity, player_x, player_y, score, last_hit_time, bg_color  # Include score and last_hit_time in global variables
+    global ball_velocity, player_x, player_y, score, last_hit_time, bg_color, stationary_x, stationary_y  # Include score and last_hit_time in global variables
     # Calculate the vector from the stationary ball to the player
     dx = player_x - stationary_x
     dy = player_y - stationary_y
     distance = math.sqrt(dx**2 + dy**2)
-    
+
     # Check for collision
     if distance < player_radius + stationary_radius:
         # Normalize the collision vector
@@ -67,6 +70,11 @@ def handle_collision():
         
         # Increment score and reset the timer every time a collision occurs
         score += 1
+        stationary_x = random.randint(1, 500)
+        stationary_y = random.randint(100, 300)
+
+
+
         last_hit_time = time.time()  # Reset the combo timer
         
         # Dot product of the velocity and the normal vector (to calculate the reflection)
@@ -81,7 +89,7 @@ def handle_collision():
         player_x += normal_x * overlap
         player_y += normal_y * overlap
 
-        bg_color = WHITE
+        bg_color = FLASH
 
 # Function to get the grade based on the combo score
 def get_grade(combo_score):
@@ -133,8 +141,16 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                
+                friction = 1
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_SPACE:
+                friction = 0.9
         if event.type == pygame.MOUSEBUTTONDOWN:
             # drag when clicked on ball
+
             mouse_x, mouse_y = pygame.mouse.get_pos()
             dragging = True
             drag_start_x, drag_start_y = mouse_x, mouse_y
@@ -148,6 +164,7 @@ while running:
                 delta_y = mouse_y - drag_start_y
                 ball_velocity = [delta_x * 0.25, delta_y * 0.25]  # Adjust sensitivity to improve accuracy
                 dragging = False
+        
 
     # Update ball physics if not dragging
     if not dragging:
@@ -172,6 +189,8 @@ while running:
             player_y = max(player_radius, min(player_y, SCREEN_HEIGHT - player_radius))  # Keep ball within bounds
         
         # Handle collision with the stationary ball
+     
+
         handle_collision()
 
     # Reset combo if time since last hit exceeds the timeout threshold

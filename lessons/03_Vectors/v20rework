@@ -1,6 +1,6 @@
-
 import pygame
 import math
+
 
 from jtlgames.vector20 import Vector20Factory
 
@@ -13,22 +13,26 @@ screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Vector with Arrow")
 
-# Create a new Vector20 class with customized screen size and scale
-Vector20, draw_v20, draw_grid = Vector20Factory(screen_width, screen_height, 20)
-draw_grid(screen)
+class V20rework:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    
+    def __mul__(self, scale_factor):
+        # Scale both x and y components
+        return V20rework(self.x * scale_factor, self.y * scale_factor)
+    
+    def __repr__(self):
+        return f"V20rework({self.x}, {self.y})"
+    
+    def rotate(self, angle):
+        return V20rework(self.x * angle, self.y / angle)
 
-# Create some vectors
-Vector20, draw_v20, draw_grid = Vector20Factory(screen_width, screen_height, 20)
-draw_grid(screen)
 
-v0 = (0,1)
-v1 = Vector20(0, 1)
-scale_factor = 10
-v1 *= scale_factor
-draw_v20(screen, v0, v1)
-
-
-draw_v20(screen, v0, v1)
+# Create Vectors
+v1 = V20rework(0,1)
+v1scaled = v1 * 10
+print(v1scaled)
 
 # Update display
 pygame.display.flip()

@@ -87,15 +87,29 @@ class Spaceship(pygame.sprite.Sprite):
         
         keys = pygame.key.get_pressed()
 
+
         if keys[pygame.K_LEFT]:
             self.angle -= 5
 
         if keys[pygame.K_RIGHT]:
             self.angle += 5
 
-        if keys[pygame.K_UP]:
-            forwardv = pygame.Vector2(1, 1)
-            self.velocity += forwardv
+        if pygame.KEYDOWN:
+            
+            if keys[pygame.K_UP]:
+                print("hi")
+                forwardv = pygame.Vector2(0.1, 0.1).rotate(self.angle)
+                self.velocity += forwardv
+
+        
+        if pygame.KEYUP:
+            if keys[pygame.K_DOWN]:
+                print("nah")
+                self.velocity = pygame.Vector2(0, 0)
+        
+        
+
+        
 
         if keys[pygame.K_SPACE] and self.ready_to_shoot():
             self.fire_projectile()
