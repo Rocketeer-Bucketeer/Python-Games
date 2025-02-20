@@ -84,51 +84,36 @@ class Spaceship(pygame.sprite.Sprite):
     # we also need to call the update method of the parent class, so we use
     # super().update()
     def update(self):
-        
         keys = pygame.key.get_pressed()
 
-
+        # Rotation control
         if keys[pygame.K_LEFT]:
             self.angle -= 5
 
         if keys[pygame.K_RIGHT]:
             self.angle += 5
 
-        if pygame.KEYDOWN:
-            
-            if keys[pygame.K_UP]:
-                print("hi")
-                forwardv = pygame.Vector2(0.1, 0.1).rotate(self.angle)
-                self.velocity += forwardv
+        
+        if keys[pygame.K_UP]:
+            forwardv = pygame.Vector2(0, -0.1).rotate(self.angle)  
+            self.velocity += forwardv  
+        else:
+            self.velocity *= 0.98  # Slow down
 
-        
-        if pygame.KEYUP:
-            if keys[pygame.K_DOWN]:
-                print("nah")
-                self.velocity = pygame.Vector2(0, 0)
-        
-        
-
-        
-
+        # Shooting control
         if keys[pygame.K_SPACE] and self.ready_to_shoot():
             self.fire_projectile()
 
+       
         self.image = pygame.transform.rotate(self.original_image, -self.angle)
 
-        # Reassigning the rect because the image has changed.
+        
         self.rect = self.image.get_rect(center=self.rect.center)
         
+        
         self.rect.center += self.velocity
-
-        # Dont forget this part! If you don't call the Sprite update method, the
-        # sprite will not be drawn
+        
         super().update()
-
-    # WAIT! Where is the draw method? We don't need to define it because the
-    # Sprite class already has a draw method that will draw the image on the
-    # screen. We only need to add the sprite to a group and the group will take
-    # care of drawing the sprite.
 
         
 
@@ -141,9 +126,7 @@ class Projectile(pygame.sprite.Sprite):
         self.game = None  # will be set in Game.add()
         self.settings = settings
 
-        # The (0,-1) part makes the vector point up, and the rotate method
-        # rotates the vector by the given angle. Finally, we multiply the vector
-        # by the velocity (scalar) to get the final velocity vector.
+        
         self.velocity = pygame.Vector2(0, -1).rotate(angle) * velocity
 
         # Dont forget to create the image and rect attributes for the sprite

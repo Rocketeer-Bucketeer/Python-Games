@@ -9,7 +9,7 @@ pygame.init()
 SCREEN_WIDTH = 650
 SCREEN_HEIGHT = 470
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Red Ball Launch!")
+pygame.display.set_caption("cool game yes yes very cool indeed")
 
 # Colors
 FLASH = (150,150,150)
@@ -83,7 +83,7 @@ def handle_collision():
         # Reflect the velocity
         ball_velocity[0] -= 2 * velocity_dot_normal * normal_x
         ball_velocity[1] -= 2 * velocity_dot_normal * normal_y
-        
+        print(ball_velocity)
         # Position the player ball outside the stationary ball to avoid sticking
         overlap = player_radius + stationary_radius - distance
         player_x += normal_x * overlap
