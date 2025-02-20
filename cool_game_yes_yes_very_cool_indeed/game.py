@@ -145,6 +145,7 @@ while running:
             if event.key == pygame.K_SPACE:
                 
                 friction = 1
+                
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 friction = 0.9
