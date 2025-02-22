@@ -1,6 +1,8 @@
 import pygame
 import math
+from pathlib import Path
 
+assets = Path(__file__).parent / "images"
 
 class Settings:
     """Class to store game configuration."""
@@ -9,8 +11,8 @@ class Settings:
     height = 600
     fps = 60
     triangle_size = 20
-    projectile_speed = 5
-    projectile_size = 11
+    projectile_speed = 10
+    projectile_size = 10
     shoot_delay = 250  # 250 milliseconds between shots, or 4 shots per second
     colors = {"white": (255, 255, 255), "black": (0, 0, 0), "red": (255, 0, 0)}
 
@@ -22,6 +24,8 @@ class Settings:
 # multiple objects of the same type, like projectiles.
 class Spaceship(pygame.sprite.Sprite):
     """Class representing the spaceship."""
+
+    
 
     def __init__(self, settings, position):
         super().__init__()
@@ -115,7 +119,12 @@ class Spaceship(pygame.sprite.Sprite):
         
         super().update()
 
+class AlienSpaceship(Spaceship):
+    
+    def create_spaceship_image(self):
+        """Creates the spaceship shape as a surface."""
         
+        return pygame.image.load(assets/'alien1.gif')       
 
 class Projectile(pygame.sprite.Sprite):
     """Class to handle projectile movement and drawing."""
@@ -218,7 +227,7 @@ if __name__ == "__main__":
 
     game = Game(settings)
 
-    spaceship = Spaceship(
+    spaceship = AlienSpaceship(
         settings, position=(settings.width // 2, settings.height // 2)
     )
 

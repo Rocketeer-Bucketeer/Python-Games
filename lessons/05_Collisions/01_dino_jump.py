@@ -97,6 +97,8 @@ class Player(pygame.sprite.Sprite):
 player = Player()
 player_group = pygame.sprite.GroupSingle(player)
 
+
+
 # Add obstacles periodically
 def add_obstacle(obstacles):
     # random.random() returns a random float between 0 and 1, so a value

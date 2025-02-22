@@ -17,6 +17,8 @@ class Settings:
 
 # Spaceship class to handle player movement and drawing
 class Spaceship:
+    
+    
     def __init__(self, settings):
         self.settings = settings
         self.position = pygame.Vector2(self.settings.width // 2, self.settings.height // 2)

@@ -93,11 +93,22 @@ def handle_collision():
 
 # Function to get the grade based on the combo score
 def get_grade(combo_score):
-    if combo_score >= 500:
-        return "SSS", (255, 215, 0)  # Gold for SSS
+    
+    if combo_score >= 1000:
+        return("nice, how r u feeling? oh yea, you can turn you ball purple now", (255, 0, 191))
+    elif combo_score >= 750:
+        return("ah, good job indeed, keep going", (187, 242, 148))
+    elif combo_score >= 500:
+        return("ur not special kid", (179, 0, 0))
+    elif combo_score >= 499:
+        return("@@@***@@@", (255, 176, 201))
     elif combo_score >= 250:
-        return "SS", (255, 0, 0)  # Red for SS
+        return("you have been noticed by the bad game gods. ")
     elif combo_score >= 100:
+        return "SSS", (255, 215, 0)  # Gold for SSS
+    elif combo_score >= 50:
+        return "SS", (255, 0, 0)  # Red for SS
+    elif combo_score >= 25:
         return "S", (0, 255, 0)  # Green for S
     elif combo_score >= 10:
         return "A", (0, 0, 255)  # Blue for A
@@ -203,8 +214,7 @@ while running:
 
     # Draw the stationary ball (large ball)
     pygame.draw.circle(screen, RED, (stationary_x, stationary_y), stationary_radius)
-
-    # Draw the red ball (player ball)
+    # Draw the blue ball (player ball)
     pygame.draw.circle(screen, BLUE, (int(player_x), int(player_y)), player_radius)
 
     # Show score and grade

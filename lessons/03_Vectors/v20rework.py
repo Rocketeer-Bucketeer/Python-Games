@@ -43,7 +43,7 @@ base = V20rework(1, 1)
 # Height of the triangle (along the y-axis)
 height = V20rework(0, 1)
 # Hypotenuse (diagonal)
-diag = V20rework(1,1)
+diag = V20rework(1,1).rotate(45)
 # Scale the vectors to make the triangle bigger
 base_scaled = base * 200
 height_scaled = height * 200
