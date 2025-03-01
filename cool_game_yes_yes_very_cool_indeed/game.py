@@ -52,6 +52,7 @@ clock = pygame.time.Clock()
 # Font for the score
 font = pygame.font.SysFont("Arial", 30)
 
+player_speed = 100
 
 
 # Function to handle collision with the stationary ball
@@ -83,7 +84,6 @@ def handle_collision():
         # Reflect the velocity
         ball_velocity[0] -= 2 * velocity_dot_normal * normal_x
         ball_velocity[1] -= 2 * velocity_dot_normal * normal_y
-        print(ball_velocity)
         # Position the player ball outside the stationary ball to avoid sticking
         overlap = player_radius + stationary_radius - distance
         player_x += normal_x * overlap
@@ -95,13 +95,13 @@ def handle_collision():
 def get_grade(combo_score):
     
     if combo_score >= 1000:
-        return("nice, how r u feeling? oh yea, you can turn you ball purple now", (255, 0, 191))
+        return "SSSSSS++"
     elif combo_score >= 750:
-        return("ah, good job indeed, keep going", (187, 242, 148))
+        return "SSSSS"
     elif combo_score >= 500:
-        return("ur not special kid", (179, 0, 0))
+        return "halfway there"
     elif combo_score >= 499:
-        return("@@@***@@@", (255, 176, 201))
+        return "SSSS"
     elif combo_score >= 250:
         return("you have been noticed by the bad game gods. ")
     elif combo_score >= 100:
@@ -147,6 +147,10 @@ while running:
     if bg_color != BLACK:
         pause = True
         bg_color = BLACK
+
+
+
+    player_speed = ((ball_velocity[0] * ball_velocity[1]) * 0.1)
 
     # Event handling
     for event in pygame.event.get():
@@ -237,8 +241,14 @@ while running:
 
     # Frame rate
     if pause:
-        pygame.time.delay(100)
-        pause = False
+        if round(player_speed) > 250:
+            pygame.time.delay(225)
+            pygame.display.flip()
+        else:
+            pygame.time.delay(round(player_speed))
+            print(player_speed)
+            pause = False
+        
     clock.tick(60)
 
 # Quit Pygame

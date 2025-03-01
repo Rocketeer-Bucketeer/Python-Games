@@ -29,9 +29,9 @@ WHITE = (255, 255, 255)
 FPS = 60
 
 # Player attributes
-PLAYER_SIZE = 25
+PLAYER_SIZE = 50
 
-player_speed = 5
+player_speed = 15
 
 # Obstacle attributes
 OBSTACLE_WIDTH = 20
@@ -79,19 +79,30 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 50
         self.rect.y = HEIGHT - PLAYER_SIZE - 10
         self.speed = player_speed
+        self.gravity = 0.3
+        self.jump_velocity = 6
+        self.velocity = 0
+        self.is_jumping = False
+        self.score = 0
+
+
+
 
     def update(self):
+        self.rect.y += self.velocity
+        self.velocity += self.gravity
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-            self.rect.y -= self.speed
-        if keys[pygame.K_DOWN]:
-            self.rect.y += self.speed
+        if keys[pygame.K_SPACE] and self.is_jumping == False:
+            self.velocity = -self.jump_velocity
+            self.is_jumping = True
 
         # Keep the player on screen
         if self.rect.top < 0:
             self.rect.top = 0
+            print("hi")
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+            self.is_jumping = False
 
 # Create a player object
 player = Player()
@@ -108,7 +119,7 @@ def add_obstacle(obstacles):
     # The combination of the randomness and the time allows for random
     # obstacles, but not too close together. 
     
-    if random.random() < 0.4:
+    if random.random() < 0.35:
         obstacle = Obstacle()
         obstacles.add(obstacle)
         return 1
@@ -116,7 +127,7 @@ def add_obstacle(obstacles):
 
 
 # Main game loop
-def game_loop():
+class game_loop():
     clock = pygame.time.Clock()
     game_over = False
     last_obstacle_time = pygame.time.get_ticks()

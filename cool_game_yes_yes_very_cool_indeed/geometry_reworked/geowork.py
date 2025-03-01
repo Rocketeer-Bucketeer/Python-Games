@@ -46,4 +46,5 @@ class TrigRework:
 
 test = TrigRework(4, 5, None)
 print(test.calculate_missing_side())
+
 #it works i think
