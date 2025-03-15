@@ -10,6 +10,8 @@ import pygame
 import random
 from pathlib import Path
 
+score = 0
+game_over = False
 # Initialize Pygame
 pygame.init()
 
@@ -29,7 +31,7 @@ WHITE = (255, 255, 255)
 FPS = 60
 
 # Player attributes
-PLAYER_SIZE = 50
+PLAYER_SIZE = 20
 
 player_speed = 15
 
@@ -44,8 +46,10 @@ font = pygame.font.SysFont(None, 36)
 
 # Define an obstacle class
 class Obstacle(pygame.sprite.Sprite):
+
     def __init__(self):
         super().__init__()
+        
         self.image = pygame.Surface((OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
         self.image.fill(BLACK)
         self.rect = self.image.get_rect()
@@ -55,18 +59,24 @@ class Obstacle(pygame.sprite.Sprite):
         self.explosion = pygame.image.load(images_dir / "explosion1.gif")
 
     def update(self):
+        global score
         self.rect.x -= obstacle_speed
         # Remove the obstacle if it goes off screen
         if self.rect.right < 0:
             self.kill()
+            score += 1
 
-    def explode(self):
+
+    def explode(self): 
+        global game_over
         """Replace the image with an explosition image."""
         
         # Load the explosion image
         self.image = self.explosion
         self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
         self.rect = self.image.get_rect(center=self.rect.center)
+        game_over = True
+        
 
 
 # Define a player class
@@ -83,7 +93,6 @@ class Player(pygame.sprite.Sprite):
         self.jump_velocity = 6
         self.velocity = 0
         self.is_jumping = False
-        self.score = 0
 
 
 
@@ -104,6 +113,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
             self.is_jumping = False
 
+
 # Create a player object
 player = Player()
 player_group = pygame.sprite.GroupSingle(player)
@@ -111,25 +121,15 @@ player_group = pygame.sprite.GroupSingle(player)
 
 
 # Add obstacles periodically
-def add_obstacle(obstacles):
-    # random.random() returns a random float between 0 and 1, so a value
-    # of 0.25 means that there is a 25% chance of adding an obstacle. Since
-    # add_obstacle() is called every 100ms, this means that on average, an
-    # obstacle will be added every 400ms.
-    # The combination of the randomness and the time allows for random
-    # obstacles, but not too close together. 
-    
-    if random.random() < 0.35:
-        obstacle = Obstacle()
-        obstacles.add(obstacle)
-        return 1
-    return 0
+
 
 
 # Main game loop
 class game_loop():
+    global score
+    global game_over
     clock = pygame.time.Clock()
-    game_over = False
+    
     last_obstacle_time = pygame.time.get_ticks()
 
     # Group for obstacles
@@ -139,7 +139,21 @@ class game_loop():
 
     obstacle_count = 0
 
+
     while not game_over:
+        def add_obstacle(obstacles):
+    # random.random() returns a random float between 0 and 1, so a value
+    # of 0.25 means that there is a 25% chance of adding an obstacle. Since
+    # add_obstacle() is called every 100ms, this means that on average, an
+    # obstacle will be added every 400ms.
+    # The combination of the randomness and the time allows for random
+    # obstacles, but not too close together. 
+     
+            if random.random() < 0.35:
+                obstacle = Obstacle()
+                obstacles.add(obstacle)
+                return 0
+            return 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -166,14 +180,17 @@ class game_loop():
         obstacles.draw(screen)
 
         # Display obstacle count
-        obstacle_text = font.render(f"Obstacles: {obstacle_count}", True, BLACK)
+        obstacle_text = font.render(f"Obstacles: {score}", True, BLACK)
+        print(score)
         screen.blit(obstacle_text, (10, 10))
 
         pygame.display.update()
         clock.tick(FPS)
 
     # Game over screen
-    screen.fill(WHITE)
+    print("Game oveR????")
+    
+
 
 if __name__ == "__main__":
     game_loop()

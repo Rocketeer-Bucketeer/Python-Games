@@ -90,20 +90,54 @@ def handle_collision():
         player_y += normal_y * overlap
 
         bg_color = FLASH
+def handle_collision2():
+    global ball_velocity, player_x, player_y, score, last_hit_time, bg_color, stationary_x, stationary_y  # Include score and last_hit_time in global variables
+    # Calculate the vector from the stationary ball to the player
+    dx = player_x - stationary_x
+    dy = player_y - stationary_y
+    distance = math.sqrt(dx**2 + dy**2)
+
+    # Check for collision
+    if distance < player_radius + stationary_radius:
+        # Normalize the collision vector
+        normal_x = dx / distance
+        normal_y = dy / distance
+        
+        # Increment score and reset the timer every time a collision occurs
+        score += 1
+        stationary_x = random.randint(1, 500)
+        stationary_y = random.randint(100, 300)
+
+
+
+        last_hit_time = time.time()  # Reset the combo timer
+        
+        # Dot product of the velocity and the normal vector (to calculate the reflection)
+        velocity_dot_normal = ball_velocity[0] * normal_x + ball_velocity[1] * normal_y
+        
+        # Reflect the velocity
+        ball_velocity[0] -= 2 * velocity_dot_normal * normal_x
+        ball_velocity[1] -= 2 * velocity_dot_normal * normal_y
+        # Position the player ball outside the stationary ball to avoid sticking
+        overlap = player_radius + stationary_radius - distance
+        player_x += normal_x * overlap
+        player_y += normal_y * overlap
+
+        bg_color = FLASH
 
 # Function to get the grade based on the combo score
 def get_grade(combo_score):
     
     if combo_score >= 1000:
-        return "SSSSSS++"
+        return "SSSSSS++", (255, 255, 255)
     elif combo_score >= 750:
-        return "SSSSS"
+        return "SSSSS", (59, 1, 47)
     elif combo_score >= 500:
-        return "halfway there"
+        return "halfway there", (66, 27, 29)
     elif combo_score >= 499:
-        return "SSSS"
+        return "SSSS", (195, 240, 247)
     elif combo_score >= 250:
-        return("you have been noticed by the bad game gods. ")
+        return "you have been noticed by the bad game gods. ", (185, 66, 245)
     elif combo_score >= 100:
         return "SSS", (255, 215, 0)  # Gold for SSS
     elif combo_score >= 50:
@@ -208,6 +242,7 @@ while running:
      
 
         handle_collision()
+        handle_collision2()
 
     # Reset combo if time since last hit exceeds the timeout threshold
     if time.time() - last_hit_time > combo_timeout:
@@ -242,12 +277,14 @@ while running:
     # Frame rate
     if pause:
         if round(player_speed) > 250:
+            
             pygame.time.delay(225)
             pygame.display.flip()
         else:
             pygame.time.delay(round(player_speed))
             print(player_speed)
             pause = False
+            
         
     clock.tick(60)
 
