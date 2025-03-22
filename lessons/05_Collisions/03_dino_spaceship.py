@@ -31,13 +31,13 @@ WHITE = (255, 255, 255)
 FPS = 60
 
 # Player attributes
-PLAYER_SIZE = 5
+PLAYER_SIZE = 50
 
 player_speed = 15
 
 # Obstacle attributes
 OBSTACLE_WIDTH = 20
-OBSTACLE_HEIGHT = 150
+OBSTACLE_HEIGHT = random.randint(1, 500)
 obstacle_speed = 5
 
 # Font
@@ -50,11 +50,12 @@ class Obstacle(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         
-        self.image = pygame.image.load(images_dir/'cactus_9.png')
+        self.image = pygame.image.load(images_dir/'ptero_0.png')
         
         self.rect = self.image.get_rect()
         self.rect.x = WIDTH
-        self.rect.y = HEIGHT - OBSTACLE_HEIGHT - 10
+    def update(self):
+        self.rect.y = HEIGHT - random.randint(1, 500) - 10
 
         self.explosion = pygame.image.load(images_dir / "explosion1.gif")
 
@@ -84,6 +85,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load(images_dir/'dino_0.png')   
+        self.image = pygame.transform.scale(self.image, (PLAYER_SIZE, PLAYER_SIZE))
         self.rect = self.image.get_rect()
         self.rect.x = 50
         self.rect.y = HEIGHT - PLAYER_SIZE - 10
@@ -91,7 +93,6 @@ class Player(pygame.sprite.Sprite):
         self.gravity = 0.3
         self.jump_velocity = 6
         self.velocity = 0
-        self.is_jumping = False
 
 
 
@@ -100,9 +101,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.velocity
         self.velocity += self.gravity
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.is_jumping == False:
+        if keys[pygame.K_SPACE]:
             self.velocity = -self.jump_velocity
-            self.is_jumping = True
 
         # Keep the player on screen
         if self.rect.top < 0:
