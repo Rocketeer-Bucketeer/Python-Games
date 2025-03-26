@@ -51,11 +51,11 @@ class Obstacle(pygame.sprite.Sprite):
         super().__init__()
         
         self.image = pygame.image.load(images_dir/'ptero_0.png')
-        
+        self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.x = WIDTH
     def update(self):
-        self.rect.y = HEIGHT - random.randint(1, 500) - 10
+        self.rect.y = 50
 
         self.explosion = pygame.image.load(images_dir / "explosion1.gif")
 
@@ -84,8 +84,8 @@ class Obstacle(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load(images_dir/'dino_0.png')   
-        self.image = pygame.transform.scale(self.image, (PLAYER_SIZE, PLAYER_SIZE))
+        self.image = pygame.image.load(images_dir/'bluebird-downflap copy.png')   
+        self.image = pygame.transform.scale(self.image, (30, 25))
         self.rect = self.image.get_rect()
         self.rect.x = 50
         self.rect.y = HEIGHT - PLAYER_SIZE - 10
@@ -95,7 +95,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity = 0
 
 
-
+ 
 
     def update(self):
         self.rect.y += self.velocity
@@ -111,6 +111,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
             self.is_jumping = False
+            game_over = True
 
 
 
@@ -141,11 +142,11 @@ class game_loop():
     player_group = pygame.sprite.GroupSingle(player)
     
 
-     
+      
 
     obstacle_count = 0
 
-
+ 
     while not game_over:
         def add_obstacle(obstacles):
     # random.random() returns a random float between 0 and 1, so a value
@@ -155,9 +156,12 @@ class game_loop():
     # The combination of the randomness and the time allows for random
     # obstacles, but not too close together. 
      
-            if random.random() < 0.35: 
+            if random.random() < 0.9: 
+                
                 obstacle = Obstacle()
+                obstacle.rect.y = HEIGHT - random.randint(50, 200) - 10
                 obstacles.add(obstacle)
+
                 return 0
             return 0
         for event in pygame.event.get():
@@ -172,6 +176,9 @@ class game_loop():
         if pygame.time.get_ticks() - last_obstacle_time > 500:
             last_obstacle_time = pygame.time.get_ticks()
             obstacle_count += add_obstacle(obstacles)
+
+
+        
         
         obstacles.update()
 

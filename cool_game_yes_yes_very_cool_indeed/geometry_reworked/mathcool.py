@@ -1,7 +1,12 @@
-# Geowork V1
+# math cool 1.1
 # idk if i find a way to call this in another project then yipee i can to geometry easily without having to actually do it
 # good luck ig
-# last update: 2/19/25
+
+
+# UPDATES
+# 1.0 - 2/19/25: Start
+
+
 
 
 import math
@@ -42,6 +47,9 @@ class TrigRework:
     def calculate_perimeter(self):
         """Calculate the perimeter of the triangle."""
         return self.base + self.height + self.hypotenuse
+
+# 1. To make a triangle with a side missing, put "none" as the missing side.
+# 2. sometihng that i made cuz i was bored and im learning trig so
 
 
 test = TrigRework(4, 5, None)

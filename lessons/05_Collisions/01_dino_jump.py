@@ -89,7 +89,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = HEIGHT - PLAYER_SIZE - 10
         self.speed = player_speed
         self.gravity = 0.3
-        self.jump_velocity = 6
+        self.jump_velocity = 10
         self.velocity = 0
         self.is_jumping = False
 

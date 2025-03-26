@@ -242,7 +242,6 @@ while running:
      
 
         handle_collision()
-        handle_collision2()
 
     # Reset combo if time since last hit exceeds the timeout threshold
     if time.time() - last_hit_time > combo_timeout:
@@ -254,7 +253,7 @@ while running:
     # Draw the stationary ball (large ball)
     pygame.draw.circle(screen, RED, (stationary_x, stationary_y), stationary_radius)
     # Draw the blue ball (player ball)
-    pygame.draw.circle(screen, BLUE, (int(player_x), int(player_y)), player_radius)
+    pygame.draw.circle(screen, GREEN, (int(player_x), int(player_y)), player_radius)
 
     # Show score and grade
     score_text = font.render(f"Combo: {score}X", True, WHITE)
@@ -270,6 +269,7 @@ while running:
         delta_x = mouse_x - drag_start_x
         delta_y = mouse_y - drag_start_y
         draw_trajectory(player_x, player_y, delta_x * 0.25, delta_y * 0.25, screen)
+        
 
     # Update the display
     pygame.display.flip()
