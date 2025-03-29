@@ -13,10 +13,13 @@ class Settings:
     SCREEN_HEIGHT = 600
     BACKGROUND_SCROLL_SPEED = 10
     FPS = 30
+    GRAVITY = 2
+    SPEED = 20
+    JUMP_VELOCITY = 20
 
 # Initialize screen
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
-pygame.display.set_caption("Background Scroll")
+pygame.display.set_caption("flappy bird game!!!")
 
 # Define background class
 class Background(pygame.sprite.Sprite):
@@ -53,30 +56,30 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.images = [pygame.image.load(d/'bluebird-downflap.png').convert_alpha(),
-                       pygame.image.load(d/'bluebird-midflap.png').convert_alpha(),
-                       pygame.image.load(d/'bluebird-upflap.png').convert_alpha()]
+        self.images = [pygame.image.load(images_dir/'bluebird-downflap.png').convert_alpha(),
+                       pygame.image.load(images_dir/'bluebird-midflap.png').convert_alpha(),
+                       pygame.image.load(images_dir/'bluebird-upflap.png').convert_alpha()]
 
-        self.speed = 20
+        self.speed = Settings.SPEED
 
         self.current_image_counter = 0 # current image number for list probably 
 
-        self.image = pygame.image.load(d/'bluebird-downflap.png').convert_alpha() # placeholder
+        self.image = self.images[0] # placeholder
 
 
         self.rect = self.image.get_rect()
-        self.rect[0] = Settings.SCREEN_WIDHT / 6 # x
-        self.rect[1] = Settings.SCREEN_HEIGHT / 2 # y
+        self.rect[0] = Settings.SCREEN_WIDTH / 6 # x  or like forward posiotion i think
+        self.rect[1] = Settings.SCREEN_HEIGHT / 2 # y hegiht
 
     def update(self):
-        pass
+        self.current_image_counter = (self.current_image_counter + 1) % 3 # update current image index
+        self.image = self.images[self.current_image_counter] # set image to the current image counter variable
+        self.speed += Settings.GRAVITY 
+        self.rect[1] += self.speed # updt height
     
+    def jump(self):
+        self.speed = -Settings.JUMP_VELOCITY
 
-    
-        
-
-
-        
 
 
 
@@ -86,6 +89,12 @@ class Player(pygame.sprite.Sprite):
 def main():
     """Run the main game loop."""
     running = True
+
+
+    flappy_group = pygame.sprite.Group()
+    flappy = Player()
+    flappy_group.add(flappy)
+
 
 
     bg = Background()
@@ -99,9 +108,21 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
+            if event.type == pygame.KEYDOWN:
+            
+                if event.key == pygame.K_SPACE:
+                    flappy.jump()
+                    ("hi")
+
 
         all_sprites.update()
         all_sprites.draw(screen)
+        flappy.update()
+        flappy_group.draw(screen)
+
+
+
+        
         pygame.display.flip()
         
         clock.tick(Settings.FPS)

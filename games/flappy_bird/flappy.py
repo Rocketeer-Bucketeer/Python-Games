@@ -191,7 +191,6 @@ def main():
                 pygame.quit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE or event.key == K_UP:
-                    bird.bump()
                     pygame.mixer.music.load(wing)
                     pygame.mixer.music.play()
 
