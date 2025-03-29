@@ -49,6 +49,39 @@ class Background(pygame.sprite.Sprite):
             self.rect.x = 0
 
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.images = [pygame.image.load(d/'bluebird-downflap.png').convert_alpha(),
+                       pygame.image.load(d/'bluebird-midflap.png').convert_alpha(),
+                       pygame.image.load(d/'bluebird-upflap.png').convert_alpha()]
+
+        self.speed = 20
+
+        self.current_image_counter = 0 # current image number for list probably 
+
+        self.image = pygame.image.load(d/'bluebird-downflap.png').convert_alpha() # placeholder
+
+
+        self.rect = self.image.get_rect()
+        self.rect[0] = Settings.SCREEN_WIDHT / 6 # x
+        self.rect[1] = Settings.SCREEN_HEIGHT / 2 # y
+
+    def update(self):
+        pass
+    
+
+    
+        
+
+
+        
+
+
+
+
+
 
 def main():
     """Run the main game loop."""
