@@ -137,7 +137,7 @@ def get_grade(combo_score):
     elif combo_score >= 499:
         return "SSSS", (195, 240, 247)
     elif combo_score >= 250:
-        return "you have been noticed by the bad game gods. ", (185, 66, 245)
+        return "purple", (185, 66, 245)
     elif combo_score >= 100:
         return "SSS", (255, 215, 0)  # Gold for SSS
     elif combo_score >= 50:

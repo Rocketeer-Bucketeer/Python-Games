@@ -16,6 +16,9 @@ class Settings:
     GRAVITY = 2
     SPEED = 20
     JUMP_VELOCITY = 20
+    PIPE_WIDTH = 50
+    PIPE_HEIGHT = 130
+    REAL_SPEED = 20
 
 # Initialize screen
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
@@ -64,7 +67,7 @@ class Player(pygame.sprite.Sprite):
 
         self.current_image_counter = 0 # current image number for list probably 
 
-        self.image = self.images[0] # placeholder
+        self.image = self.images[0] # placeholder.     
 
 
         self.rect = self.image.get_rect()
@@ -81,10 +84,25 @@ class Player(pygame.sprite.Sprite):
         self.speed = -Settings.JUMP_VELOCITY
 
 
+class Pipe(pygame.sprite.Sprite):
+    def __init__(self, x, y, backwards):
+        self.image = pygame.image.load(images_dir/'pipe-green.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (Settings.PIPE_WIDTH, Settings.PIPE_HEIGHT))
+        self.rect = self.image.get_rect()
+        self.rect[0] = x
 
-
-
-
+        if backwards:
+            self.image = pygame.transform.flip(self.image, False, True)
+            self.rect[1] = (self.rect[3]- y)
+        else:
+            self.rect[1] = Settings.SCREEN_HEIGHT - y
+        
+        self.mask = pygame.mask.from_surface(self.image)
+    
+    def update(self):
+        self.rect[0] -= Settings.REAL_SPEED
+        if self.rect[0] < 0:
+            self.kill()
 
 def main():
     """Run the main game loop."""
