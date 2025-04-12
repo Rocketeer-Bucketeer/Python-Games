@@ -155,7 +155,7 @@ def main():
         clock.tick(15)
 
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == QUIT:  
                 pygame.quit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE or event.key == K_UP:
@@ -180,8 +180,7 @@ def main():
         ground_group.draw(screen)
 
         pygame.display.update()
-
-
+  
     while True:
 
         clock.tick(15)

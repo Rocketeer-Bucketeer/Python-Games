@@ -4,7 +4,7 @@ from pathlib import Path
 
 d = Path(__file__).parent # The directory that holds the script
 images_dir = Path(__file__).parent / "images" if (Path(__file__).parent / "images").exists() else Path(__file__).parent / "assets"
-# Initialize Pygame
+# Initialize Pygame 
 pygame.init()
 
 class Settings:
@@ -18,7 +18,8 @@ class Settings:
     JUMP_VELOCITY = 20
     PIPE_WIDTH = 50
     PIPE_HEIGHT = 130
-    REAL_SPEED = 20
+    REAL_SPEED = 20.   
+    PIPE_GAP = 200 
 
 # Initialize screen
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
@@ -66,7 +67,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = Settings.SPEED
 
         self.current_image_counter = 0 # current image number for list probably 
-
+  
         self.image = self.images[0] # placeholder.     
 
 
@@ -86,10 +87,12 @@ class Player(pygame.sprite.Sprite):
 
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, x, y, backwards):
+        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(images_dir/'pipe-green.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (Settings.PIPE_WIDTH, Settings.PIPE_HEIGHT))
         self.rect = self.image.get_rect()
         self.rect[0] = x
+        
 
         if backwards:
             self.image = pygame.transform.flip(self.image, False, True)
@@ -104,14 +107,29 @@ class Pipe(pygame.sprite.Sprite):
         if self.rect[0] < 0:
             self.kill()
 
-def main():
+
+def getPipePos(x):
+    size = random.randint(100, 300)
+    bottom_pipe = Pipe(x, size, False)
+    top_pipe = Pipe(True, x, Settings.SCREEN_HEIGHT - size - Settings.PIPE_GAP)
+    return bottom_pipe, top_pipe
+
+def main(): 
     """Run the main game loop."""
     running = True
 
-
+  
     flappy_group = pygame.sprite.Group()
-    flappy = Player()
+    flappy = Player() 
     flappy_group.add(flappy)
+
+    pipe_group = pygame.sprite.Group()
+    for i in range(2):
+        pipes = getPipePos(Settings.SCREEN_WIDTH + 800)
+        pipe_group.add(pipes[0])
+        pipe_group.add(pipes[1])
+        print(pipe_group)
+
 
 
 
@@ -120,11 +138,13 @@ def main():
     all_sprites.add(bg)
 
     clock = pygame.time.Clock()
+    print(pipe_group)
 
-    while running:
+    while running:   
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                running = False 
 
             if event.type == pygame.KEYDOWN:
             
@@ -132,15 +152,16 @@ def main():
                     flappy.jump()
                     ("hi")
 
-
+ 
         all_sprites.update()
         all_sprites.draw(screen)
         flappy.update()
-        flappy_group.draw(screen)
-
-
-
+        pipe_group.update()
         
+        
+        flappy_group.draw(screen)
+        pipe_group.draw(screen)
+         
         pygame.display.flip()
         
         clock.tick(Settings.FPS)
