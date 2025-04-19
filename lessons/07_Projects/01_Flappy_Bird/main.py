@@ -9,8 +9,8 @@ pygame.init()
 
 class Settings:
     """A class to store all settings for the game."""
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
+    SCREEN_WIDTH = 600
+    SCREEN_HEIGHT = 400
     BACKGROUND_SCROLL_SPEED = 10
     FPS = 30
     GRAVITY = 2
@@ -18,8 +18,8 @@ class Settings:
     JUMP_VELOCITY = 20
     PIPE_WIDTH = 50
     PIPE_HEIGHT = 130
-    REAL_SPEED = 20.   
-    PIPE_GAP = 200 
+    REAL_SPEED = 20   
+    PIPE_GAP = 100
 
 # Initialize screen
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
@@ -84,35 +84,41 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         self.speed = -Settings.JUMP_VELOCITY
 
-
+ 
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, x, y, backwards):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(images_dir/'pipe-green.png').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (Settings.PIPE_WIDTH, Settings.PIPE_HEIGHT))
+        super().__init__()
+        self.original_image = pygame.image.load(images_dir/'pipe-green.png').convert_alpha()
+        self.original_image = pygame.transform.scale(self.original_image, (Settings.PIPE_WIDTH, Settings.PIPE_HEIGHT))
+        self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.rect[0] = x
-        
-
-        if backwards:
-            self.image = pygame.transform.flip(self.image, False, True)
-            self.rect[1] = (self.rect[3]- y)
-        else:
-            self.rect[1] = Settings.SCREEN_HEIGHT - y
-        
         self.mask = pygame.mask.from_surface(self.image)
-    
+        self.backwards = backwards
+        self.reset(x, y, backwards)
+
+    def reset(self, x, y, backwards):
+        self.image = pygame.transform.flip(self.original_image, False, True) if backwards else self.original_image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        if backwards:
+            Settings.PIPE_HEIGHT = self.rect.height - y  # flip pipe
+        else:
+            Settings.PIPE_HEIGHT = Settings.SCREEN_HEIGHT - y
+
     def update(self):
-        self.rect[0] -= Settings.REAL_SPEED
-        if self.rect[0] < 0:
-            self.kill()
+        self.rect.x -= Settings.REAL_SPEED
+        if self.rect.right < 0:
+            Settings.PIPE_HEIGHT = random.randint(0, 200)
+            self.reset(Settings.SCREEN_WIDTH, Settings.PIPE_HEIGHT if not self.backwards else Settings.SCREEN_HEIGHT - Settings.PIPE_HEIGHT - Settings.PIPE_GAP, self.backwards)
+
 
 
 def getPipePos(x):
-    size = random.randint(100, 300)
-    bottom_pipe = Pipe(x, size, False)
-    top_pipe = Pipe(True, x, Settings.SCREEN_HEIGHT - size - Settings.PIPE_GAP)
+    size = random.randint(0, 200)
+    top_pipe = Pipe(x, size, True)
+    bottom_pipe = Pipe(x, (200 - size) + Settings.PIPE_GAP, False)
     return bottom_pipe, top_pipe
+    
 
 def main(): 
     """Run the main game loop."""
@@ -124,10 +130,10 @@ def main():
     flappy_group.add(flappy)
 
     pipe_group = pygame.sprite.Group()
-    for i in range(2):
+    for i in range(1):
         pipes = getPipePos(Settings.SCREEN_WIDTH + 800)
-        pipe_group.add(pipes[0])
         pipe_group.add(pipes[1])
+        pipe_group.add(pipes[0])
         print(pipe_group)
 
 
