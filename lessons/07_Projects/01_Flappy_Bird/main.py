@@ -2,89 +2,72 @@ import pygame
 import random
 from pathlib import Path
 
-d = Path(__file__).parent # The directory that holds the script
-images_dir = Path(__file__).parent / "images" if (Path(__file__).parent / "images").exists() else Path(__file__).parent / "assets"
-# Initialize Pygame 
+# Setup paths
+d = Path(__file__).parent
+images_dir = d / "images" if (d / "images").exists() else d / "assets"
+
 pygame.init()
 
 class Settings:
-    """A class to store all settings for the game."""
     SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 400
-    BACKGROUND_SCROLL_SPEED = 10
-    FPS = 30
-    GRAVITY = 2
-    SPEED = 20
-    JUMP_VELOCITY = 20
+    BACKGROUND_SCROLL_SPEED = 4
+    FPS = 60
+    GRAVITY = 0.75
+    SPEED = 0
+    JUMP_VELOCITY = 10
     PIPE_WIDTH = 50
     PIPE_HEIGHT = 130
-    REAL_SPEED = 20   
-    PIPE_GAP = 100
+    REAL_SPEED = 5
+    PIPE_GAP = 200
 
-# Initialize screen
+# Setup screen
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
 pygame.display.set_caption("flappy bird game!!!")
 
-# Define background class
+# Background
 class Background(pygame.sprite.Sprite):
-    """Represents the scrolling background in the game."""
     def __init__(self):
         super().__init__()
-        
-        # The Sprite image is 2x as wide as the screen
         self.image = pygame.Surface((Settings.SCREEN_WIDTH * 2, Settings.SCREEN_HEIGHT))
-        
-        # Load the background image and scale it to the screen size. Note the convert() call. 
-        # This converts the form of the image to be more efficient. 
-        orig_image= pygame.image.load(images_dir/'background.png').convert()
-        orig_image = pygame.transform.scale(orig_image, (Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
-        
-        # Then, copy it into the self.image surface twice
-        self.image.blit(orig_image, (0, 0))
-        self.image.blit(orig_image, (Settings.SCREEN_WIDTH, 0))
-        
+        bg = pygame.image.load(images_dir / 'background.png').convert()
+        bg = pygame.transform.scale(bg, (Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+        self.image.blit(bg, (0, 0))
+        self.image.blit(bg, (Settings.SCREEN_WIDTH, 0))
         self.rect = self.image.get_rect()
         self.rect.x = 0
-        self.rect.y = 0
 
     def update(self):
-        """Update the position of the background."""
-        
         self.rect.x -= Settings.BACKGROUND_SCROLL_SPEED
-        
         if self.rect.right <= Settings.SCREEN_WIDTH:
             self.rect.x = 0
 
-
+# Player
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.images = [pygame.image.load(images_dir/'bluebird-downflap.png').convert_alpha(),
-                       pygame.image.load(images_dir/'bluebird-midflap.png').convert_alpha(),
-                       pygame.image.load(images_dir/'bluebird-upflap.png').convert_alpha()]
-
+        super().__init__()
+        self.images = [
+            pygame.image.load(images_dir/'bluebird-downflap.png').convert_alpha(),
+            pygame.image.load(images_dir/'bluebird-midflap.png').convert_alpha(),
+            pygame.image.load(images_dir/'bluebird-upflap.png').convert_alpha()
+        ]
+        self.current_image_counter = 0
+        self.image = self.images[0]
+        self.rect = self.image.get_rect()
+        self.rect[0] = Settings.SCREEN_WIDTH / 6
+        self.rect[1] = Settings.SCREEN_HEIGHT / 2
         self.speed = Settings.SPEED
 
-        self.current_image_counter = 0 # current image number for list probably 
-  
-        self.image = self.images[0] # placeholder.     
-
-
-        self.rect = self.image.get_rect()
-        self.rect[0] = Settings.SCREEN_WIDTH / 6 # x  or like forward posiotion i think
-        self.rect[1] = Settings.SCREEN_HEIGHT / 2 # y hegiht
-
     def update(self):
-        self.current_image_counter = (self.current_image_counter + 1) % 3 # update current image index
-        self.image = self.images[self.current_image_counter] # set image to the current image counter variable
-        self.speed += Settings.GRAVITY 
-        self.rect[1] += self.speed # updt height
-    
+        self.current_image_counter = (self.current_image_counter + 1) % len(self.images)
+        self.image = self.images[self.current_image_counter]
+        self.speed += Settings.GRAVITY
+        self.rect[1] += self.speed
+
     def jump(self):
         self.speed = -Settings.JUMP_VELOCITY
 
- 
+# Pipe
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, x, y, backwards):
         super().__init__()
@@ -92,7 +75,6 @@ class Pipe(pygame.sprite.Sprite):
         self.original_image = pygame.transform.scale(self.original_image, (Settings.PIPE_WIDTH, Settings.PIPE_HEIGHT))
         self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
         self.backwards = backwards
         self.reset(x, y, backwards)
 
@@ -100,82 +82,96 @@ class Pipe(pygame.sprite.Sprite):
         self.image = pygame.transform.flip(self.original_image, False, True) if backwards else self.original_image
         self.rect = self.image.get_rect()
         self.rect.x = x
-        if backwards:
-            Settings.PIPE_HEIGHT = self.rect.height - y  # flip pipe
-        else:
-            Settings.PIPE_HEIGHT = Settings.SCREEN_HEIGHT - y
+        self.rect.y = y
+        self.scored = False
 
     def update(self):
         self.rect.x -= Settings.REAL_SPEED
         if self.rect.right < 0:
-            Settings.PIPE_HEIGHT = random.randint(0, 200)
-            self.reset(Settings.SCREEN_WIDTH, Settings.PIPE_HEIGHT if not self.backwards else Settings.SCREEN_HEIGHT - Settings.PIPE_HEIGHT - Settings.PIPE_GAP, self.backwards)
-
-
+            size = random.randint(50, Settings.SCREEN_HEIGHT - Settings.PIPE_GAP - 50)
+            new_y = size if self.backwards else size + Settings.PIPE_GAP
+            self.reset(Settings.SCREEN_WIDTH + 200, new_y if not self.backwards else size - Settings.PIPE_HEIGHT, self.backwards)
 
 def getPipePos(x):
-    size = random.randint(0, 200)
-    top_pipe = Pipe(x, size, True)
-    bottom_pipe = Pipe(x, (200 - size) + Settings.PIPE_GAP, False)
+    size = random.randint(50, Settings.SCREEN_HEIGHT - Settings.PIPE_GAP - 50)
+    top_pipe = Pipe(x, size - Settings.PIPE_HEIGHT, True)
+    bottom_pipe = Pipe(x, size + Settings.PIPE_GAP, False)
     return bottom_pipe, top_pipe
-    
+def main():
+    def reset_game():
+        nonlocal flappy, flappy_group, pipe_group, score, game_over
+        flappy = Player()
+        flappy.rect.y -= 40  
+        flappy.speed = -Settings.JUMP_VELOCITY / 1.5  
 
-def main(): 
-    """Run the main game loop."""
+        flappy_group = pygame.sprite.Group(flappy)
+
+        pipe_group = pygame.sprite.Group()
+        pipes = getPipePos(Settings.SCREEN_WIDTH + 200)
+        pipe_group.add(pipes)
+
+        score = 0
+        game_over = False
+
+
     running = True
+    game_over = False
+    score = 0
+    font = pygame.font.SysFont(None, 32)
 
-  
-    flappy_group = pygame.sprite.Group()
-    flappy = Player() 
-    flappy_group.add(flappy)
+    flappy = Player()
+    flappy_group = pygame.sprite.Group(flappy)
 
     pipe_group = pygame.sprite.Group()
-    for i in range(1):
-        pipes = getPipePos(Settings.SCREEN_WIDTH + 800)
-        pipe_group.add(pipes[1])
-        pipe_group.add(pipes[0])
-        print(pipe_group)
-
-
-
+    pipes = getPipePos(Settings.SCREEN_WIDTH + 200)
+    pipe_group.add(pipes)
 
     bg = Background()
-    all_sprites = pygame.sprite.Group()
-    all_sprites.add(bg)
+    all_sprites = pygame.sprite.Group(bg)
 
     clock = pygame.time.Clock()
-    print(pipe_group)
 
-    while running:   
-        
+    while running:
+        screen.fill((0, 0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False 
+                running = False
+            if not game_over and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                flappy.jump()
+            if game_over and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                reset_game()
 
-            if event.type == pygame.KEYDOWN:
-            
-                if event.key == pygame.K_SPACE:
-                    flappy.jump()
-                    ("hi")
+        if not game_over:
+            all_sprites.update()
+            flappy.update()
+            pipe_group.update()
 
- 
-        all_sprites.update()
+            if pygame.sprite.spritecollide(flappy, pipe_group, False):
+                game_over = True
+            if flappy.rect.top < 0 or flappy.rect.bottom > Settings.SCREEN_HEIGHT:
+                game_over = True
+
+            for pipe in pipe_group:
+                if pipe.rect.right < flappy.rect.left and not getattr(pipe, "scored", False):
+                    score += 0.5
+                    pipe.scored = True
+
+       
         all_sprites.draw(screen)
-        flappy.update()
-        pipe_group.update()
-        
-        
-        flappy_group.draw(screen)
         pipe_group.draw(screen)
-         
+        flappy_group.draw(screen)
+
+        score_txt = font.render(f"Score: {int(score)}", True, (255, 255, 255))
+        screen.blit(score_txt, (20, 20))
+
+        if game_over:
+            text_thing = font.render("Game Over - Press SPACE to restart", True, (255, 0, 0))
+            screen.blit(text_thing, (Settings.SCREEN_WIDTH//2 - text_thing.get_width()//2, Settings.SCREEN_HEIGHT//2))
+
         pygame.display.flip()
-        
         clock.tick(Settings.FPS)
 
     pygame.quit()
-
-
-
 
 
 if __name__ == "__main__":
