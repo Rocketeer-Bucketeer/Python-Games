@@ -17,7 +17,7 @@ class Settings:
     SPEED = 0
     JUMP_VELOCITY = 10
     PIPE_WIDTH = 50
-    PIPE_HEIGHT = 130
+    PIPE_HEIGHT = 250 
     REAL_SPEED = 5
     PIPE_GAP = 200
 
