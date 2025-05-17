@@ -38,7 +38,7 @@ def main():
         
 
         # Event handling
-        for event in pygame.event.gwaet():
+        for event in pygame.event.wait():
             
             # Check for clicking the close button
             if event.type == pygame.QUIT:
