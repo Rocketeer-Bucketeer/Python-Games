@@ -2,58 +2,48 @@ import pygame
 import random
 from pathlib import Path
 
-
 d = Path(__file__).parent
 images_dir = d / "images" if (d / "images").exists() else d / "assets"
 
 pygame.init()
 player_count = 0
+
 class Settings():
     SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 400
     PLAYER_SPEED = 10
     FPS = 30
 
-#screen setup cool
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
 pygame.display.set_caption("tank game")
 
-
-
+# Projectile class
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, position, angle, velocity):
         super().__init__()
-
         self.velocity = pygame.Vector2(0, -1).rotate(angle) * velocity
-
-        self.images = [
-            pygame.image.load(images_dir/'bullet.png').convert_alpha()
-        ]
-
-        self.image = self.images[0]
+        self.image = pygame.image.load(images_dir/'bullet.png').convert_alpha()
         self.rect = self.image.get_rect(center=position)
 
     def update(self):
         self.rect.center += self.velocity
 
 
-
-
-
-
-
+# Player class
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         global player_count
-
         self.images = [
             pygame.image.load(images_dir/'player_blue.png').convert_alpha(),
             pygame.image.load(images_dir/'player_red.png').convert_alpha()
         ]
         self.player_ID = player_count
         player_count += 1
-        self.image = self.images[self.player_ID]
+
+        self.original_image = self.images[self.player_ID]
+        self.original_image = pygame.transform.scale(self.original_image, (100, 100))  # consistent scaling
+        self.image = self.original_image
         self.rect = self.image.get_rect()
         self.rect[0] = Settings.SCREEN_WIDTH / 6
         self.rect[1] = Settings.SCREEN_WIDTH / 2
@@ -61,73 +51,62 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
         self.last_shot = pygame.time.get_ticks()
         self.shoot_delay = 250
-        self.velocity = pygame.Vector2(0,0)
-    
+        self.velocity = pygame.Vector2(0, 0)
+
     def update(self):
         keys = pygame.key.get_pressed()
-        
-
         if self.player_ID == 0:
-            print("player one controls")
             if keys[pygame.K_a]:
                 self.angle -= 5
-                print("hihihihi")
             if keys[pygame.K_d]:
                 self.angle += 5
             if keys[pygame.K_w]:
-                vectorforward = pygame.Vector2(0, -0.1).rotate(self.angle)
-                self.velocity += vectorforward
+                self.velocity += pygame.Vector2(0, -0.5).rotate(self.angle)
             if keys[pygame.K_s]:
-                self.shoot()      
+                self.shoot()
         else:
-            print("player two controls")
             if keys[pygame.K_LEFT]:
                 self.angle -= 5
-            if keys [pygame.K_RIGHT]:
+            if keys[pygame.K_RIGHT]:
                 self.angle += 5
             if keys[pygame.K_UP]:
-                vectorforward2 = pygame.Vector2(0, -0.1).rotate(self.angle)
-                self.velocity += vectorforward2
+                self.velocity += pygame.Vector2(0, -0.5).rotate(self.angle)
             if keys[pygame.K_DOWN]:
                 self.shoot()
 
-        self.image = pygame.transform.rotate(self.image, -self.angle)
-        self.rec = self.image.get_rect(center=self.rect.center)
+        self.velocity *= 0.95
         self.rect.center += self.velocity
 
-        super().update()
+        # Rotate image from original each frame
+        self.image = pygame.transform.rotate(self.original_image, -self.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
 
-        # testing
-        print(self.player_ID)
-
-
-    
     def shoot(self):
-
         if pygame.time.get_ticks() - self.last_shot > self.shoot_delay:
             self.last_shot = pygame.time.get_ticks()
-            
-            new_projectile = Projectile()
+            new_projectile = Projectile(self.rect.center, self.angle, 15)
+            all_sprites.add(new_projectile)
+            projectiles.add(new_projectile)
 
-
-
+# Sprite groups
 test = Player()
 test2 = Player()
+players = pygame.sprite.Group(test, test2)
+projectiles = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group(test, test2)
 
-
-
-
-
-        
-
-
+# Game loop
+clock = pygame.time.Clock()
 running = True
-game_over = False
 while running:
     screen.fill((255, 255, 255))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-
-
+    all_sprites.update()
+    all_sprites.draw(screen)
     pygame.display.flip()
+    clock.tick(Settings.FPS)
 
-
+pygame.quit()

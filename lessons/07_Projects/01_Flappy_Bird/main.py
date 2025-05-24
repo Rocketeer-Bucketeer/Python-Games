@@ -130,7 +130,7 @@ def main():
     all_sprites = pygame.sprite.Group(bg)
 
     clock = pygame.time.Clock()
-
+ 
     while running:
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
