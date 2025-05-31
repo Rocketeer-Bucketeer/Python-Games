@@ -56,6 +56,12 @@ class Player(pygame.sprite.Sprite):
         self.health = 100
 
     def update(self):
+        global players,projectiles
+        spritecollision = pygame.sprite.groupcollide(players, projectiles, dokilla=False, dokillb=False)
+        if spritecollision:
+            for player in spritecollision:
+                if not player.player_ID == self.player_ID:
+                    print(player.player_ID)
         keys = pygame.key.get_pressed()
         if self.player_ID == 0:
             if keys[pygame.K_a]:
@@ -66,6 +72,7 @@ class Player(pygame.sprite.Sprite):
                 self.velocity += pygame.Vector2(0, -0.5).rotate(self.angle)
             if keys[pygame.K_s]:
                 self.shoot()
+                
         else:
             if keys[pygame.K_LEFT]:
                 self.angle -= 5
@@ -75,7 +82,7 @@ class Player(pygame.sprite.Sprite):
                 self.velocity += pygame.Vector2(0, -0.5).rotate(self.angle)
             if keys[pygame.K_DOWN]:
                 self.shoot()
-
+                
         self.velocity *= 0.95
         self.rect.center += self.velocity
 
@@ -83,16 +90,15 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def shoot(self):
+        global players
         if pygame.time.get_ticks() - self.last_shot > self.shoot_delay:
             self.last_shot = pygame.time.get_ticks()
             new_projectile = Projectile(self.rect.center, self.angle, 15)
             all_sprites.add(new_projectile)
             projectiles.add(new_projectile)
-            sprite_hitlist = pygame.sprite.spritecollide(self, projectiles, dokill=False)
-            for hitlist in sprite_hitlist:
-                if hitlist in projectiles:
-                    print("no")
-                if
+   
+            
+
 
 
 # Sprite groups
