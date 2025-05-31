@@ -45,6 +45,7 @@ class Player(pygame.sprite.Sprite):
         self.original_image = pygame.transform.scale(self.original_image, (100, 100))  # consistent scaling
         self.image = self.original_image
         self.rect = self.image.get_rect()
+        
         self.rect[0] = Settings.SCREEN_WIDTH / 6
         self.rect[1] = Settings.SCREEN_WIDTH / 2
         self.speed = Settings.PLAYER_SPEED
@@ -52,6 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.last_shot = pygame.time.get_ticks()
         self.shoot_delay = 250
         self.velocity = pygame.Vector2(0, 0)
+        self.health = 100
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -77,7 +79,6 @@ class Player(pygame.sprite.Sprite):
         self.velocity *= 0.95
         self.rect.center += self.velocity
 
-        # Rotate image from original each frame
         self.image = pygame.transform.rotate(self.original_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
@@ -87,12 +88,19 @@ class Player(pygame.sprite.Sprite):
             new_projectile = Projectile(self.rect.center, self.angle, 15)
             all_sprites.add(new_projectile)
             projectiles.add(new_projectile)
+            sprite_hitlist = pygame.sprite.spritecollide(self, projectiles, dokill=False)
+            for hitlist in sprite_hitlist:
+                if hitlist in projectiles:
+                    print("no")
+                if
+
 
 # Sprite groups
 test = Player()
 test2 = Player()
 players = pygame.sprite.Group(test, test2)
 projectiles = pygame.sprite.Group()
+
 all_sprites = pygame.sprite.Group(test, test2)
 
 # Game loop
@@ -106,6 +114,7 @@ while running:
 
     all_sprites.update()
     all_sprites.draw(screen)
+    
     pygame.display.flip()
     clock.tick(Settings.FPS)
 
