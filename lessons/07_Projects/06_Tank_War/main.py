@@ -19,11 +19,12 @@ pygame.display.set_caption("tank game")
 
 # Projectile class
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, position, angle, velocity):
+    def __init__(self, player, angle, velocity):
         super().__init__()
+        self.proj_ID = player.player_ID
         self.velocity = pygame.Vector2(0, -1).rotate(angle) * velocity
         self.image = pygame.image.load(images_dir/'bullet.png').convert_alpha()
-        self.rect = self.image.get_rect(center=position)
+        self.rect = self.image.get_rect(center=player.rect.center)
 
     def update(self):
         self.rect.center += self.velocity
@@ -33,7 +34,7 @@ class Projectile(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        global player_count
+        global player_count, running
         self.images = [
             pygame.image.load(images_dir/'player_blue.png').convert_alpha(),
             pygame.image.load(images_dir/'player_red.png').convert_alpha()
@@ -54,15 +55,28 @@ class Player(pygame.sprite.Sprite):
         self.shoot_delay = 250
         self.velocity = pygame.Vector2(0, 0)
         self.health = 100
+        self.damage = 10
 
     def update(self):
-        global players,projectiles
+        global players,projectiles,game_over
         spritecollision = pygame.sprite.groupcollide(players, projectiles, dokilla=False, dokillb=False)
         if spritecollision:
             for player in spritecollision:
-                if not player.player_ID == self.player_ID:
-                    print(player.player_ID)
+                for projectile in spritecollision[player]:
+                    if self.player_ID == player.player_ID and not self.player_ID == projectile.proj_ID:
+                        projectile.kill()
+                        player.health -= self.damage
+                        print(player.health)
+        if self.health <= 0:
+            self.kill()
+            game_over = True
+
+
+        
+
+                        
         keys = pygame.key.get_pressed()
+
         if self.player_ID == 0:
             if keys[pygame.K_a]:
                 self.angle -= 5
@@ -93,15 +107,12 @@ class Player(pygame.sprite.Sprite):
         global players
         if pygame.time.get_ticks() - self.last_shot > self.shoot_delay:
             self.last_shot = pygame.time.get_ticks()
-            new_projectile = Projectile(self.rect.center, self.angle, 15)
+            new_projectile = Projectile(self, self.angle, 15)
+            new_projectile.proj_ID = self.player_ID
             all_sprites.add(new_projectile)
             projectiles.add(new_projectile)
    
             
-
-
-
-# Sprite groups
 test = Player()
 test2 = Player()
 players = pygame.sprite.Group(test, test2)
@@ -109,14 +120,44 @@ projectiles = pygame.sprite.Group()
 
 all_sprites = pygame.sprite.Group(test, test2)
 
+
+def reset_game():
+    global test, test2, players, projectiles, all_sprites
+    test = Player()
+    test2 = Player()
+    players = pygame.sprite.Group(test, test2)
+    projectiles = pygame.sprite.Group()
+
+    all_sprites = pygame.sprite.Group(test, test2)
+
+
+
+
+
+
+# Sprite groups
+
 # Game loop
 clock = pygame.time.Clock()
 running = True
+game_over = False
+
 while running:
+
     screen.fill((255, 255, 255))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    if game_over == True:
+        clock = pygame.time.Clock()
+        running = True
+        game_over = False
+        reset_game()
+    
+
+
+
+
 
     all_sprites.update()
     all_sprites.draw(screen)
