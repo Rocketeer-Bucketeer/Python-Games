@@ -67,7 +67,6 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         global players, projectiles, game_over
-        print(self.rect.width)
 
         # Collision detection
         spritecollision = pygame.sprite.groupcollide(players, projectiles, False, False)
@@ -123,13 +122,38 @@ class Player(pygame.sprite.Sprite):
 class Powerup(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        self.image = pygame.image.load(images_dir / 'health_pack.png').convert_alpha()
+        self.heal_amount = 15
+        self.rect = self.image.get_rect()
+        self.rect[0] = random.randint(100, 500)
+        self.rect[1] = random.randint(100, 400)
+
+    def heal(self, playerhealed):
+        playerhealed.health = playerhealed.health + self.heal_amount
+        self.kill()
+
+    def update(self):
+        healcollisions = pygame.sprite.collide_rect(self.rect)
+        if healcollisions:
+            print("h")
+
+
+
+pygame.sprite.collide_rect
+
+
+
+
+
 
 
 
 # Setup variables
 players = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
+powerups = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
+
 clock = pygame.time.Clock()
 running = True
 game_over = False
@@ -138,23 +162,34 @@ def reset_game():
     global test, test2, players, projectiles, all_sprites, player_count, game_over
     player_count = 0
     game_over = False
+
     test = Player()
     test2 = Player()
+    cool_powerup = Powerup()
+    powerups = pygame.sprite.Group(cool_powerup)
     players = pygame.sprite.Group(test, test2)
     projectiles = pygame.sprite.Group()
-    all_sprites = pygame.sprite.Group(test, test2)
+    all_sprites = pygame.sprite.Group(test, test2, cool_powerup)
 
 reset_game()
 
 def main():
     global clock, running, game_over
     while running:
+
+
         screen.fill((237, 229, 119))
         font = pygame.font.SysFont(None, 32)
+
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+
+
+
 
         all_sprites.update()
         all_sprites.draw(screen)
@@ -169,10 +204,13 @@ def main():
         pygame.display.flip()
         clock.tick(Settings.FPS)
 
+        
+
         if game_over:
             print("Game Over!")
             pygame.time.delay(3500)
             reset_game()
+
 
     pygame.quit()
 
