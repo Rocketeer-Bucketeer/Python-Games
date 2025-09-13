@@ -66,10 +66,10 @@ class Player(pygame.sprite.Sprite):
         self.damage = 5
 
     def update(self):
-        global players, projectiles, game_over
+        global players, projectiles, game_over, powerups, fpowerups
 
-        # Collision detection
         spritecollision = pygame.sprite.groupcollide(players, projectiles, False, False)
+    
         for player in spritecollision:
             for projectile in spritecollision[player]:
                 if player.player_ID != projectile.proj_ID:
@@ -80,6 +80,26 @@ class Player(pygame.sprite.Sprite):
         if self.health <= 0:
             self.kill()
             game_over = True
+        
+        healcollision = pygame.sprite.groupcollide(players, powerups, False, True)
+
+
+        for player in healcollision:
+            if player.player_ID == 1:
+                player.health = player.health + 15
+            else:
+                player.health = player.health + 15
+        
+
+        fpowerupcollision = pygame.sprite.groupcollide(players, fpowerups, False, True)
+
+        for player in fpowerupcollision:
+            if player.player_ID == 1:
+                player.health = player.health - 15
+            else:
+                player.health = player.health - 15
+
+        
 
 
 
@@ -132,20 +152,16 @@ class Powerup(pygame.sprite.Sprite):
         playerhealed.health = playerhealed.health + self.heal_amount
         self.kill()
 
-    def update(self):
-        healcollisions = pygame.sprite.collide_rect(self.rect)
-        if healcollisions:
-            print("h")
 
 
-
-pygame.sprite.collide_rect
-
-
-
-
-
-
+class FakePowerup(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load(images_dir / 'health_pack.png').convert_alpha()
+        self.heal_amount = 15
+        self.rect = self.image.get_rect()
+        self.rect[0] = random.randint(100, 500)
+        self.rect[1] = random.randint(100, 400)
 
 
 # Setup variables
@@ -159,17 +175,21 @@ running = True
 game_over = False
 
 def reset_game():
-    global test, test2, players, projectiles, all_sprites, player_count, game_over
+    global test, test2, players, projectiles, all_sprites, player_count, game_over, powerup, powerups, fpowerup, fpowerups
     player_count = 0
     game_over = False
 
     test = Player()
     test2 = Player()
-    cool_powerup = Powerup()
-    powerups = pygame.sprite.Group(cool_powerup)
+    fpowerup = FakePowerup()
+    powerup = Powerup()
+
+    powerups = pygame.sprite.Group(powerup)
+    fpowerups = pygame.sprite.Group(fpowerup)
     players = pygame.sprite.Group(test, test2)
+
     projectiles = pygame.sprite.Group()
-    all_sprites = pygame.sprite.Group(test, test2, cool_powerup)
+    all_sprites = pygame.sprite.Group(test, test2, powerup, fpowerup )
 
 reset_game()
 
