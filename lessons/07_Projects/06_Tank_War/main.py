@@ -69,6 +69,9 @@ class Player(pygame.sprite.Sprite):
         global players, projectiles, game_over, powerups, fpowerups
 
         spritecollision = pygame.sprite.groupcollide(players, projectiles, False, False)
+
+        for test in projectiles:
+            print(test)
     
         for player in spritecollision:
             for projectile in spritecollision[player]:
